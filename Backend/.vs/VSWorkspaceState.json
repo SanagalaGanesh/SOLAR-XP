@@ -4,8 +4,10 @@
     "\\aspnet-core",
     "\\aspnet-core\\src",
     "\\aspnet-core\\src\\core.Application",
-    "\\aspnet-core\\src\\core.Application\\Solar"
+    "\\aspnet-core\\src\\core.Application\\Solar",
+    "\\aspnet-core\\src\\core.Core",
+    "\\aspnet-core\\src\\core.Core\\Solar"
   ],
-  "SelectedNode": "\\aspnet-core\\src\\core.Application\\Solar\\SolarAppService.cs",
+  "SelectedNode": "\\aspnet-core\\src\\core.Core\\Solar\\SolarManager.cs",
   "PreviewInSolutionExplorer": false
 }

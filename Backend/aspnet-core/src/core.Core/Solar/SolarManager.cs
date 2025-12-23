@@ -185,7 +185,7 @@ namespace core.Solar
             }).ToList();
         }
 
-        // 6. CUSTOMER: PLACE ORDER
+        // 6. CUSTOMER: PLACE ORDERS
         public async Task<string> PlaceOrderAsync(int itemId)
         {
             var item = await _itemRepo.GetAsync(itemId);

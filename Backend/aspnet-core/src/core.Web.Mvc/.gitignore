@@ -6,3 +6,20 @@ wwwroot/dist/
 wwwroot/view-resources/Views/**/*.min.*
 wwwroot/view-resources/Views/Shared/Components/**/*.min.*
 /package-lock.json
+
+# Visual Studio
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+ 
+# VS Code / Copilot
+CopilotIndex/
+*.db
+*.sqlite
+*.bin
+ 
+# OS
+Thumbs.db
+.DS_Store
