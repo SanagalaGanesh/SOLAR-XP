@@ -1,0 +1,11 @@
+{
+  "/api": {
+    "target": "http://192.168.168.76:5000",
+    "secure": false,
+    "changeOrigin": true,
+    "logLevel": "debug",
+    "headers": {
+      "Connection": "keep-alive"
+    }
+  }
+}

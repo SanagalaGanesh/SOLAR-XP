@@ -1,0 +1,37 @@
+.login-container {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #1e3c72, #2a5298);
+}
+
+.login-card {
+  background: white;
+  padding: 32px;
+  width: 360px;
+  border-radius: 14px;
+}
+
+.form-group {
+  margin-bottom: 16px;
+}
+.login-h2{
+    text-align: center;
+}
+input {
+  width: 94%;
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+button {
+  width: 100%;
+  padding: 12px;
+  background: #6c63ff;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
