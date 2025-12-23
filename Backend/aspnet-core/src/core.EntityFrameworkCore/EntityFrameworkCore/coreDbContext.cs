@@ -9,7 +9,7 @@ namespace core.EntityFrameworkCore;
 
 public class coreDbContext : AbpZeroDbContext<Tenant, Role, User, coreDbContext>
 {
-    /* Define a DbSet for each entity of the application */
+    /* Define a DbSet for each entity of the application  */
     public DbSet<SolarProduct> SolarProducts { get; set; }
     public DbSet<QuoteHeader> QuoteHeaders { get; set; }
     public DbSet<QuoteItem> QuoteItems { get; set; }
