@@ -1,0 +1,189 @@
+/* =========================
+   MODAL BACKDROP
+   ========================= */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 3000;
+}
+
+/* =========================
+   AUTH CARD
+   ========================= */
+.auth-card {
+  position: relative;
+  width: 380px;
+  background: #ffffff;
+  padding: 30px;
+  border-radius: 14px;
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
+  animation: fadeSlide 0.6s ease;
+}
+
+/* =========================
+   CLOSE (X) BUTTON – DISTINCT STYLE
+   ========================= */
+.close-btn {
+  position: absolute;
+  top: 12px;
+  right: 14px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #f3f4f6;
+  border: none;
+  font-size: 16px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #374151;
+  transition: all 0.2s ease;
+}
+
+.close-btn:hover {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+/* =========================
+   HEADING
+   ========================= */
+.auth-card h2 {
+  text-align: center;
+  margin-bottom: 22px;
+  font-size: 22px;
+  font-weight: 600;
+  color: #111827;
+}
+
+/* =========================
+   INPUTS
+   ========================= */
+.auth-card input {
+  width: 94%;
+  padding: 11px;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  margin-bottom: 6px;
+  font-size: 14px;
+}
+
+.auth-card input:focus {
+  outline: none;
+  border-color: #6366f1;
+}
+
+/* =========================
+   ERROR TEXT
+   ========================= */
+.auth-card small {
+  display: block;
+  color: #dc2626;
+  font-size: 12px;
+  margin-bottom: 10px;
+}
+
+/* =========================
+   PRIMARY BUTTON (LOGIN / SIGNUP)
+   ========================= */
+.auth-card button[type="submit"] {
+  width: 100%;
+  padding: 12px;
+  border-radius: 10px;
+  border: none;
+  background: linear-gradient(135deg, #4f46e5, #9333ea);
+  color: white;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 14px;
+  transition: all 0.25s ease;
+}
+
+.auth-card button[type="submit"]:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 25px rgba(99, 102, 241, 0.4);
+}
+
+/* =========================
+   SWITCH TEXT (LOGIN ↔ SIGNUP)
+   ========================= */
+.switch-text {
+  margin-top: 16px;
+  text-align: center;
+  font-size: 14px;
+  color: #374151;
+}
+
+.highlight {
+  color: #6366f1;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.highlight:hover {
+  text-decoration: underline;
+}
+
+/* =========================
+   LINKS (FORGOT PASSWORD)
+   ========================= */
+.auth-links {
+  display: flex;
+  justify-content: center;
+  margin-top: 12px;
+  font-size: 13px;
+}
+
+.auth-links span {
+  color: #2563eb;
+  cursor: pointer;
+}
+
+.auth-links span:hover {
+  text-decoration: underline;
+}
+
+/* =========================
+   ANIMATION
+   ========================= */
+@keyframes fadeSlide {
+  from {
+    opacity: 0;
+    transform: translateY(25px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+.error {
+  color: #dc2626;
+  display: block;
+  margin-top: 10px;
+  text-align: center;
+}
+
+.success {
+  color: #16a34a;
+  display: block;
+  margin-top: 10px;
+  text-align: center;
+}
+.forgot-text {
+  text-align: right;
+  font-size: 13px;
+  color: #6366f1;
+  cursor: pointer;
+  margin: 6px 0 14px;
+}
+
+.forgot-text:hover {
+  text-decoration: underline;
+}
