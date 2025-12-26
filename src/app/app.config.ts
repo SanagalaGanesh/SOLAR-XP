@@ -10,7 +10,6 @@ export const appConfig: ApplicationConfig = {
   providers: [
     provideRouter(routes),
     provideAnimations(),
-
     // 🔐 HTTP client with JWT auth interceptor (ABP compatible)
     provideHttpClient(
       withInterceptors([authInterceptor])

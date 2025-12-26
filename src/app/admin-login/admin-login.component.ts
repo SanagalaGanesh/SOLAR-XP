@@ -72,19 +72,27 @@ export class AdminLoginComponent {
       next: (res: any) => {
         this.loading = false;
 
-        if (res?.result?.accessToken) {
+        const token = res?.result?.accessToken;
+        const userId = res?.result?.userId;
 
-          // ✅ STORE ADMIN SESSION (SEPARATE)
-          localStorage.setItem('ADMIN_TOKEN', res.result.accessToken);
-          localStorage.setItem('ADMIN_ID', String(res.result.userId));
-          localStorage.setItem('ROLE', 'ADMIN');
-
-          // 🚀 Redirect to Admin Dashboard
-          this.router.navigateByUrl('/admin', { replaceUrl: true });
-
-        } else {
+        if (!token) {
           this.errorMessage = 'Invalid credentials';
+          return;
         }
+
+        // 🔥 CLEAR USER SESSION (IMPORTANT)
+        localStorage.removeItem('access_token');
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('USER_TOKEN');
+        localStorage.removeItem('userId');
+
+        // ✅ STORE ADMIN SESSION
+        localStorage.setItem('ADMIN_TOKEN', token);
+        localStorage.setItem('ADMIN_ID', String(userId));
+        localStorage.setItem('ROLE', 'ADMIN');
+
+        // 🚀 REDIRECT
+        this.router.navigateByUrl('/admin', { replaceUrl: true });
       },
       error: (err) => {
         this.loading = false;
