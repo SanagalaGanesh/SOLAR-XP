@@ -1,0 +1,440 @@
+/* =========================
+   LAYOUT
+========================= */
+.dashboard {
+  display: flex;
+  min-height: 100vh;
+  background: #f5f7fb;
+  font-family: Inter, Arial, sans-serif;
+}
+
+/* =========================
+   SIDEBAR
+========================= */
+.sidebar {
+  width: 260px;
+  background: linear-gradient(180deg, #0f172a, #020617);
+  color: white;
+  padding: 20px 16px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+  position: relative;
+}
+
+.sidebar-collapsed .sidebar {
+  width: 80px;
+  padding: 20px 0;
+}
+
+/* PROFILE */
+.profile {
+  text-align: center;
+  padding-bottom: 20px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  margin-bottom: 20px;
+  transition: all 0.3s ease;
+}
+
+.avatar {
+  width: 52px;
+  height: 52px;
+  background: linear-gradient(135deg, #6366f1, #4f46e5);
+  border-radius: 50%;
+  margin: auto;
+  display: grid;
+  place-items: center;
+  font-weight: bold;
+  font-size: 18px;
+  transition: all 0.3s ease;
+}
+
+.sidebar-collapsed .avatar {
+  width: 48px;
+  height: 48px;
+  font-size: 16px;
+}
+
+.sidebar-collapsed .profile h3,
+.sidebar-collapsed .profile p {
+  display: none;
+}
+
+.sidebar-collapsed .profile {
+  padding-bottom: 16px;
+  margin-bottom: 16px;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+/* =========================
+   MENU
+========================= */
+.sidebar ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.sidebar li {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  cursor: pointer;
+  margin-bottom: 6px;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.sidebar li:hover {
+  background: rgba(255,255,255,0.08);
+}
+
+.sidebar li.active {
+  background: rgba(99,102,241,0.15);
+}
+
+/* Active indicator */
+.sidebar li.active::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 8px;
+  bottom: 8px;
+  width: 4px;
+  background: #6366f1;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+}
+
+/* ICONS */
+.sidebar li .icon {
+  font-size: 20px;
+  min-width: 24px;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+/* MENU TEXT */
+.sidebar li .menu-text {
+  opacity: 1;
+  transition: opacity 0.3s ease;
+}
+
+/* =========================
+   COLLAPSED SIDEBAR STYLES
+========================= */
+.sidebar-collapsed .sidebar li {
+  justify-content: center;
+  padding: 14px 0;
+  margin: 0 8px 8px;
+  border-radius: 8px;
+}
+
+.sidebar-collapsed .sidebar li .menu-text {
+  opacity: 0;
+  width: 0;
+  overflow: hidden;
+  position: absolute;
+}
+
+/* Icon adjustments for collapsed state */
+.sidebar-collapsed .sidebar li .icon {
+  font-size: 22px;
+  margin: 0;
+}
+
+/* Active state adjustments */
+.sidebar-collapsed .sidebar li.active {
+  background: rgba(99,102,241,0.25);
+}
+
+.sidebar-collapsed .sidebar li.active::before {
+  width: 3px;
+  left: 0;
+  top: 10px;
+  bottom: 10px;
+  border-radius: 0 4px 4px 0;
+}
+
+/* Tooltip for collapsed state */
+.sidebar li {
+  position: relative;
+}
+
+.sidebar-collapsed .sidebar li::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  left: 100%;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(15, 23, 42, 0.95);
+  color: white;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 14px;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+  z-index: 100;
+  margin-left: 10px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  border: 1px solid rgba(255,255,255,0.1);
+}
+
+.sidebar-collapsed .sidebar li:hover::after {
+  opacity: 1;
+  visibility: visible;
+  margin-left: 15px;
+}
+
+/* =========================
+   COLLAPSE TOGGLE BUTTON
+========================= */
+.sidebar-toggle {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(99,102,241,0.2);
+  border: 1px solid rgba(99,102,241,0.4);
+  color: white;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  z-index: 10;
+}
+
+.sidebar-toggle:hover {
+  background: rgba(99,102,241,0.3);
+  transform: translateX(-50%) scale(1.05);
+}
+
+.sidebar-collapsed .sidebar-toggle {
+  left: 50%;
+  transform: translateX(-50%) rotate(180deg);
+}
+
+.sidebar-collapsed .sidebar-toggle:hover {
+  transform: translateX(-50%) rotate(180deg) scale(1.05);
+}
+
+/* =========================
+   CONTENT
+========================= */
+.content {
+  flex: 1;
+  padding: 28px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  margin-left: 0;
+}
+
+/* When sidebar is collapsed, content shifts */
+.sidebar-collapsed .content {
+  margin-left: 0;
+}
+
+/* =========================
+   TOP BAR
+========================= */
+.topbar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 28px;
+}
+
+.toggle-btn {
+  border: none;
+  background: #111827;
+  color: white;
+  padding: 10px 14px;
+  border-radius: 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+  font-weight: 500;
+}
+
+.toggle-btn:hover {
+  background: #1f2937;
+  transform: translateX(-2px);
+}
+
+.toggle-btn .icon {
+  font-size: 18px;
+  transition: transform 0.3s ease;
+}
+
+.sidebar-collapsed .toggle-btn .icon {
+  transform: rotate(180deg);
+}
+
+/* =========================
+   CARDS
+========================= */
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 22px;
+}
+
+.card {
+  color: white;
+  padding: 22px;
+  border-radius: 16px;
+  box-shadow: 0 14px 30px rgba(0,0,0,0.15);
+  transition: all 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+}
+
+.card h4 {
+  font-size: 14px;
+  opacity: 0.9;
+  margin-bottom: 8px;
+}
+
+.card p {
+  font-size: 32px;
+  font-weight: 700;
+  margin-top: 8px;
+}
+
+/* GRADIENTS */
+.gradient-blue {
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+}
+
+.gradient-green {
+  background: linear-gradient(135deg, #10b981, #059669);
+}
+
+.gradient-orange {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+}
+
+.gradient-red {
+  background: linear-gradient(135deg, #ef4444, #b91c1c);
+}
+
+/* =========================
+   CHARTS
+========================= */
+.charts {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 24px;
+  margin-top: 32px;
+}
+
+.chart-box {
+  background: white;
+  padding: 24px;
+  border-radius: 16px;
+  box-shadow: 0 14px 30px rgba(0,0,0,0.08);
+  transition: all 0.3s ease;
+}
+
+.chart-box:hover {
+  box-shadow: 0 20px 40px rgba(0,0,0,0.12);
+}
+
+.chart-box h4 {
+  margin-bottom: 16px;
+  color: #374151;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+/* BAR CHART */
+.bar-chart {
+  display: flex;
+  align-items: flex-end;
+  gap: 14px;
+  height: 180px;
+  padding-top: 20px;
+}
+
+.bar-chart div {
+  width: 18%;
+  background: linear-gradient(180deg, #6366f1, #4338ca);
+  border-radius: 6px 6px 0 0;
+  transition: height 0.3s ease;
+  min-height: 20px;
+}
+
+/* LINE GRAPH */
+.line-chart {
+  width: 100%;
+  height: 180px;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+@media (max-width: 768px) {
+  .charts {
+    grid-template-columns: 1fr;
+  }
+
+  .content {
+    padding: 16px;
+  }
+
+  .sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    z-index: 1000;
+    transform: translateX(-100%);
+  }
+
+  .sidebar-open .sidebar {
+    transform: translateX(0);
+  }
+
+  .sidebar-open .content {
+    margin-left: 0;
+  }
+
+  .sidebar-collapsed .sidebar {
+    width: 70px;
+  }
+
+  .toggle-btn {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    z-index: 1001;
+    padding: 12px;
+  }
+}
+
+/* Animation for icons in collapsed state */
+@keyframes iconPulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
+.sidebar-collapsed .sidebar li:hover .icon {
+  animation: iconPulse 0.3s ease;
+}

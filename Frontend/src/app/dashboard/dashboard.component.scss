@@ -1,0 +1,349 @@
+/* =========================
+   MAIN DASHBOARD LAYOUT
+   ========================= */
+.dashboard {
+  width: 100%;
+  min-height: 100vh;
+  padding: 24px 32px;
+  background: #f5f7fb;
+  box-sizing: border-box;
+}
+
+/* =========================
+   HEADER
+   ========================= */
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 28px;
+}
+
+.welcome {
+  color: #666;
+  margin-top: 4px;
+}
+
+.profile {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.avatar {
+  background: #6c63ff;
+  color: white;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-weight: bold;
+}
+
+.logout {
+  border: none;
+  background: #ff5a5a;
+  color: white;
+  padding: 6px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+/* =========================
+   STATS CARDS
+   ========================= */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 20px;
+  width: 100%;
+}
+
+.stat-card {
+  padding: 22px;
+  border-radius: 14px;
+  color: white;
+}
+
+.stat-card span {
+  font-size: 14px;
+  opacity: 0.9;
+}
+
+.stat-card h3 {
+  margin-top: 8px;
+  font-size: 30px;
+}
+
+/* CARD COLORS */
+.purple { background: linear-gradient(135deg, #6a5acd, #7b68ee); }
+.blue   { background: linear-gradient(135deg, #2196f3, #21cbf3); }
+.yellow { background: linear-gradient(135deg, #ffb300, #ffca28); }
+.pink   { background: linear-gradient(135deg, #ec407a, #f06292); }
+
+/* =========================
+   PRIMARY CTA
+   ========================= */
+.primary-action {
+  margin: 28px 0;
+}
+
+.primary-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 26px;
+  background: #6c63ff;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+/* =========================
+   TABLE CARDS
+   ========================= */
+.table-card {
+  width: 100%;
+  background: white;
+  padding: 24px;
+  border-radius: 14px;
+  margin-top: 28px;
+  box-sizing: border-box;
+}
+
+.table-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+/* TABLE */
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th {
+  text-align: left;
+  font-weight: 600;
+  padding-bottom: 14px;
+}
+
+td {
+  padding: 14px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.processing {
+  color: #ff9800;
+  font-weight: 500;
+}
+
+.ready {
+  color: #2e7d32;
+  font-weight: 500;
+}
+
+/* BUTTONS */
+.small-btn {
+  padding: 6px 14px;
+  background: #6c63ff;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+/* =========================
+   OVERLAY (MODAL BACKDROP)
+   ========================= */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+/* =========================
+   QUOTE FORM CARD
+   ========================= */
+.quote-form-card {
+  background: #f4f6fb;
+  width: 420px;
+  max-width: 92%;
+  padding: 28px;
+  border-radius: 14px;
+}
+
+/* FORM */
+.form-title {
+  text-align: center;
+  margin-bottom: 18px;
+  color: #3f51b5;
+}
+
+.form-group {
+  margin-bottom: 14px;
+}
+
+.form-group label {
+  display: block;
+  font-size: 14px;
+  margin-bottom: 6px;
+}
+
+input,
+textarea {
+  width: 98%;
+  padding: 4px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+/* ACTIONS */
+.form-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 18px;
+}
+
+.cancel-btn {
+  background: transparent;
+  border: none;
+  color: #2196f3;
+  cursor: pointer;
+}
+
+.submit-btn {
+  background: #6c63ff;
+  color: white;
+  padding: 10px 22px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+}
+
+/* =========================
+   RESPONSIVE FIXES
+   ========================= */
+@media (max-width: 768px) {
+  .dashboard {
+    padding: 16px;
+  }
+
+  .dashboard-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+}
+.quote-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.quote-table thead {
+  background: linear-gradient(135deg, #2563eb, #0ea5e9);
+  color: white;
+}
+
+.quote-table th,
+.quote-table td {
+  padding: 14px 16px;
+  text-align: left;
+  font-size: 14px;
+}
+
+.quote-table tbody tr {
+  border-bottom: 1px solid #e5e7eb;
+  transition: background 0.2s ease;
+}
+
+.quote-table tbody tr:hover {
+  background: #f9fafb;
+}
+
+.sno {
+  font-weight: 600;
+}
+
+.date {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.item-name {
+  font-weight: 500;
+  margin-bottom: 13px;
+}
+
+.price {
+  color: #16a34a;
+  font-weight: 600;
+}
+
+.muted {
+  color: #9ca3af;
+}
+
+.address {
+  max-width: 220px;
+  color: #374151;
+}
+
+.status {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.status.ordered {
+  background: #dcfce7;
+  color: #166534;
+  margin-bottom: 6px;
+}
+
+.status.pending {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.buy-btn {
+  background: #2563eb;
+  color: white;
+  border: none;
+  padding: 6px 14px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 13px;
+  margin-bottom: 6px;
+}
+
+.buy-btn:hover {
+  background: #1d4ed8;
+}
+
+.empty {
+  text-align: center;
+  padding: 30px;
+  color: #6b7280;
+}
+.price {
+  display: block;          /* 👈 important */
+  color: #16a34a;
+  font-weight: 600;
+  margin-bottom: 14px;     /* 👈 gap between prices */
+}
