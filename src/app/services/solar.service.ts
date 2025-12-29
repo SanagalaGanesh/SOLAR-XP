@@ -31,10 +31,11 @@ export class SolarService {
   /**
    * 🔹 Submit a new solar quote
    */
+  
 submitQuote(payload: {
   userId: number;
   mobile: string;
-  addressLine1: string;
+  addressLine1: string; 
   addressLine2: string;
   selectedTypes: string[];
   selectedWatts: number[];
