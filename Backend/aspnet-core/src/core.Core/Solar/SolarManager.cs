@@ -2,7 +2,7 @@
 using Abp.Domain.Services;
 using Abp.UI;
 using core.SolarEntities;
-using core.Authorization.Users; // User details kosam
+using core.Authorization.Users;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -30,12 +30,29 @@ namespace core.Solar
             _orderRepo = orderRepo;
         }
 
-        // 1. CUSTOMER: SUBMIT QUOTE
+        // 1. CUSTOMER: SUBMIT QUOTE (UPDATED VALIDATION LOGIC)
         public async Task<string> SubmitQuoteAsync(long userId, string mobile, string addressLine1, string addressLine2, List<string> selectedTypes, List<int> selectedWatts)
         {
+            // Basic Validation
             if (selectedTypes == null || !selectedTypes.Any()) throw new UserFriendlyException("Select at least one Panel Type!");
             if (selectedWatts == null || !selectedWatts.Any()) throw new UserFriendlyException("Select at least one Wattage!");
+            bool productsFound = false;
+            foreach (var type in selectedTypes)
+            {
+                foreach (var watt in selectedWatts)
+                {
+                    var count = await _productRepo.CountAsync(p => p.Type == type && p.Watt == watt);
+                    if (count > 0) productsFound = true;
+                }
+            }
 
+            if (!productsFound)
+            {
+
+                throw new UserFriendlyException("Selected Product Combinations not found in Database! Please ask Admin to add products first (Ex: Mono - 450W).");
+            }
+
+            // Create Header
             var header = new QuoteHeader
             {
                 UserId = userId,
@@ -46,11 +63,15 @@ namespace core.Solar
             };
             int headerId = await _headerRepo.InsertAndGetIdAsync(header);
 
+            // Create Items
+            int itemsAdded = 0;
             foreach (var type in selectedTypes)
             {
                 foreach (var watt in selectedWatts)
                 {
                     var product = await _productRepo.FirstOrDefaultAsync(p => p.Type == type && p.Watt == watt);
+
+
                     if (product != null)
                     {
                         decimal locationCharge = product.Watt * 10;
@@ -65,9 +86,18 @@ namespace core.Solar
                             Status = "Pending"
                         };
                         await _itemRepo.InsertAsync(item);
+                        itemsAdded++;
                     }
                 }
             }
+
+            if (itemsAdded == 0)
+            {
+
+                await _headerRepo.DeleteAsync(headerId);
+                throw new UserFriendlyException("Failed to add items. Please verify Product Types (Mono/Poly/Thin) match exactly in Database.");
+            }
+
             return $"Success! Quote Submitted. ID: {headerId}";
         }
 
@@ -75,19 +105,17 @@ namespace core.Solar
         public object GetAdminRequests(string statusType)
         {
             var query = _headerRepo.GetAll()
-                        .Include(h => h.User) // Include User to get Name
+                        .Include(h => h.User)
                         .Include(h => h.QuoteItems).ThenInclude(i => i.SolarProduct)
                         .OrderByDescending(h => h.CreationTime)
                         .AsQueryable();
 
             if (statusType == "Pending")
             {
-                // Logic: Ee request lo okka item pending unna, adi pending kindhe vastundi
                 query = query.Where(h => h.QuoteItems.Any(i => !i.IsApproved));
             }
             else if (statusType == "Approved")
             {
-                // Logic: Anni items approve ayyi undali
                 query = query.Where(h => h.QuoteItems.All(i => i.IsApproved) && h.QuoteItems.Count > 0);
             }
 
@@ -98,12 +126,9 @@ namespace core.Solar
                 HeaderId = h.Id,
                 CustomerName = h.User != null ? (h.User.Name + " " + h.User.Surname) : "Guest",
                 Mobile = h.Mobile,
-                Address = $"{h.AddressLine1}, {h.AddressLine2}", // Full Address
+                Address = $"{h.AddressLine1}, {h.AddressLine2}",
                 Date = h.CreationTime.ToString("dd-MMM-yyyy"),
-
-                // Total Value of this Quote
                 TotalAmount = h.QuoteItems.Sum(i => i.CalculatedPrice).ToString("N0"),
-
                 Items = h.QuoteItems.Select(i => new
                 {
                     ItemId = i.Id,
@@ -114,7 +139,7 @@ namespace core.Solar
             }).ToList();
         }
 
-        // 3. ADMIN: APPROVE WHOLE QUOTE (Header Click -> Approve All)
+        // 3. ADMIN: APPROVE WHOLE QUOTE
         public async Task<string> ApproveQuoteHeaderAsync(int headerId)
         {
             var items = await _itemRepo.GetAllListAsync(x => x.QuoteHeaderId == headerId);
@@ -124,16 +149,14 @@ namespace core.Solar
 
             foreach (var item in items)
             {
-                // Okka click tho anni items approve ayipotayi
                 item.IsApproved = true;
                 item.Status = "Approved";
-                // Repository changes automatic ga save avutayi (UnitOfWork)
             }
 
             return "Quote Request Fully Approved!";
         }
 
-        // 4. ADMIN: GET ALL ORDERS (For Orders Tab)
+        // 4. ADMIN: GET ALL ORDERS
         public object GetAdminOrders()
         {
             var orders = _orderRepo.GetAll()
@@ -147,7 +170,7 @@ namespace core.Solar
                 OrderId = o.Id,
                 CustomerName = o.QuoteItem.QuoteHeader.User != null ? (o.QuoteItem.QuoteHeader.User.Name + " " + o.QuoteItem.QuoteHeader.User.Surname) : "Unknown",
                 Mobile = o.QuoteItem.QuoteHeader.Mobile,
-                Address = o.QuoteItem.QuoteHeader.AddressLine2, // City mainly
+                Address = o.QuoteItem.QuoteHeader.AddressLine2,
                 ModelName = $"{o.QuoteItem.SolarProduct.Type} - {o.QuoteItem.SolarProduct.Watt}W",
                 Amount = o.QuoteItem.CalculatedPrice.ToString("N0"),
                 Status = o.OrderStatus,
@@ -170,15 +193,11 @@ namespace core.Solar
                 HeaderId = h.Id,
                 Date = h.CreationTime.ToString("dd-MMM-yyyy"),
                 Address = h.AddressLine1 + ", " + h.AddressLine2,
-
                 Items = h.QuoteItems.Select(i => new
                 {
                     ItemId = i.Id,
                     Product = $"{i.SolarProduct.Type} - {i.SolarProduct.Watt}W",
-
-                    // Show price only if approved
                     Price = i.IsApproved ? i.CalculatedPrice.ToString("N0") : "TBD",
-
                     Status = i.Status,
                     CanBuy = i.IsApproved && i.Status != "Ordered"
                 }).ToList()
@@ -207,17 +226,14 @@ namespace core.Solar
             return "Order Placed Successfully!";
         }
 
-        // =========================================================
-        // 7. PRODUCT CRUD OPERATIONS (ADDED AS REQUESTED)
-        // =========================================================
+
 
         // A. GET ALL PRODUCTS
-        public List<SolarProduct> GetAllProducts()
+        public async Task<List<SolarProduct>> GetAllProducts()
         {
-            return _productRepo.GetAll()
-                               .OrderBy(p => p.Type)
-                               .ThenBy(p => p.Watt)
-                               .ToList();
+            return await _productRepo.GetAll()
+                        .OrderBy(p => p.Id)
+                        .ToListAsync();
         }
 
         // B. GET PRODUCT BY ID
@@ -231,7 +247,6 @@ namespace core.Solar
         // C. CREATE PRODUCT
         public async Task CreateProductAsync(string type, int watt, decimal basePrice, decimal subsidy)
         {
-            // Check for duplicates
             var existing = await _productRepo.FirstOrDefaultAsync(p => p.Type == type && p.Watt == watt);
             if (existing != null) throw new UserFriendlyException("Product with this Type and Wattage already exists!");
 
@@ -263,7 +278,6 @@ namespace core.Solar
         // E. DELETE PRODUCT
         public async Task DeleteProductAsync(int id)
         {
-            // Optional: Check if used in any QuoteItems before deleting to avoid errors
             var isUsed = await _itemRepo.CountAsync(i => i.SolarProductId == id);
             if (isUsed > 0)
             {

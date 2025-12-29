@@ -1,6 +1,10 @@
 ﻿using Abp.Application.Services;
+using Abp.Application.Services.Dto;
 using Abp.Authorization;
+using Abp.Domain.Repositories;
 using core.Authorization;
+using core.Solar.Dto;
+using core.SolarEntities;
 using Microsoft.AspNetCore.Authorization;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -17,12 +21,8 @@ namespace core.Solar
             _solarManager = solarManager;
         }
 
-        // ==========================================
-        // EXISTING FUNCTIONALITIES (Quotes & Orders)
-        // ==========================================
-
         // 1. Submit Quote 
-        public async Task<object> SubmitQuote(SubmitInput input)
+        public async Task<object> SubmitQuote(SubmitQuoteInput input)
         {
             string result = await _solarManager.SubmitQuoteAsync(
                 input.UserId,
@@ -49,7 +49,7 @@ namespace core.Solar
         }
 
         [Authorize(Roles = "Admin")]
-        public async Task<object> ApproveQuoteHeader(SimpleIdInput input)
+        public async Task<object> ApproveQuoteHeader(EntityDto input)
         {
             string result = await _solarManager.ApproveQuoteHeaderAsync(input.Id);
             return new { message = result };
@@ -60,89 +60,46 @@ namespace core.Solar
             return _solarManager.GetMyQuotes(userId);
         }
 
-        public async Task<object> PlaceOrder(ItemInput input)
+        public async Task<object> PlaceOrder(ItemInputDto input)
         {
             string result = await _solarManager.PlaceOrderAsync(input.ItemId);
             return new { message = result };
         }
 
-        // ==========================================
-        // NEW: PRODUCT CRUD OPERATIONS (Admin Only)
-        // ==========================================
 
         [Authorize(Roles = "Admin")]
-        public object GetAllProducts()
+        public async Task<List<SolarProductDto>> GetAllProducts()
         {
-            return _solarManager.GetAllProducts();
+            var products = await _solarManager.GetAllProducts();
+            return ObjectMapper.Map<List<SolarProductDto>>(products);
         }
 
         [Authorize(Roles = "Admin")]
-        public async Task<object> GetProduct(SimpleIdInput input)
+        public async Task<SolarProductDto> GetProduct(EntityDto input)
         {
-            return await _solarManager.GetProductByIdAsync(input.Id);
+            var product = await _solarManager.GetProductByIdAsync(input.Id);
+            return ObjectMapper.Map<SolarProductDto>(product);
         }
 
         [Authorize(Roles = "Admin")]
-        public async Task<object> CreateProduct(CreateProductInput input)
+        public async Task<object> CreateProduct(CreateSolarProductDto input)
         {
             await _solarManager.CreateProductAsync(input.Type, input.Watt, input.BasePrice, input.Subsidy);
             return new { message = "Product Created Successfully!" };
         }
 
         [Authorize(Roles = "Admin")]
-        public async Task<object> UpdateProduct(UpdateProductInput input)
+        public async Task<object> UpdateProduct(SolarProductDto input)
         {
             await _solarManager.UpdateProductAsync(input.Id, input.Type, input.Watt, input.BasePrice, input.Subsidy);
             return new { message = "Product Updated Successfully!" };
         }
 
         [Authorize(Roles = "Admin")]
-        public async Task<object> DeleteProduct(SimpleIdInput input)
+        public async Task<object> DeleteProduct(EntityDto input)
         {
             await _solarManager.DeleteProductAsync(input.Id);
             return new { message = "Product Deleted Successfully!" };
         }
-    }
-
-    // ==========================================
-    // DTO CLASSES (Input Models)
-    // ==========================================
-
-    public class SubmitInput
-    {
-        public long UserId { get; set; }
-        public string Mobile { get; set; }
-        public string AddressLine1 { get; set; }
-        public string AddressLine2 { get; set; }
-        public List<string> SelectedTypes { get; set; }
-        public List<int> SelectedWatts { get; set; }
-    }
-
-    public class ItemInput
-    {
-        public int ItemId { get; set; }
-    }
-
-    public class SimpleIdInput
-    {
-        public int Id { get; set; }
-    }
-
-    // New DTOs for Products
-    public class CreateProductInput
-    {
-        public string Type { get; set; } // Solar Thin, Poly, Mono
-        public int Watt { get; set; }    // 450, 850, 1000
-        public decimal BasePrice { get; set; }
-        public decimal Subsidy { get; set; }
-    }
-
-    public class UpdateProductInput
-    {
-        public int Id { get; set; }
-        public string Type { get; set; }
-        public int Watt { get; set; }
-        public decimal BasePrice { get; set; }
-        public decimal Subsidy { get; set; }
     }
 }
