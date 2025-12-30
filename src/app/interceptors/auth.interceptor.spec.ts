@@ -1,31 +1,34 @@
-import { HttpInterceptorFn } from '@angular/common/http';
+import {
+  HttpInterceptorFn,
+  HttpErrorResponse
+} from '@angular/common/http';
+import { inject } from '@angular/core';
+import { Router } from '@angular/router';
+import { catchError, throwError } from 'rxjs';
 
-export const authInterceptor: HttpInterceptorFn = (req, next) => {
+export const errorInterceptor: HttpInterceptorFn = (req, next) => {
+  const router = inject(Router);
 
-  const adminToken = localStorage.getItem('ADMIN_TOKEN');
-  const userToken = localStorage.getItem('accessToken');
-
-  // 👉 Detect ADMIN APIs
-  const isAdminApi =
-    req.url.includes('/api/services/app/Solar') ||
-    req.url.includes('/api/services/app/User');
-
-  let token: string | null = null;
-
-  if (isAdminApi && adminToken) {
-    token = adminToken;       // ✅ ADMIN TOKEN FIRST
-  } else if (userToken) {
-    token = userToken;        // ✅ USER TOKEN
+  // 🚫 DO NOT HANDLE SESSION FOR AUTH API
+  if (req.url.includes('/TokenAuth/Authenticate')) {
+    return next(req);
   }
 
-  if (token) {
-    req = req.clone({
-      setHeaders: {
-        Authorization: `Bearer ${token}`,
-        'X-Requested-With': 'XMLHttpRequest'
+  return next(req).pipe(
+    catchError((error: HttpErrorResponse) => {
+
+      const hasToken =
+        localStorage.getItem('access_token') ||
+        localStorage.getItem('ADMIN_TOKEN');
+
+      // ✅ Session expired ONLY for logged-in users
+      if (error.status === 401 && hasToken) {
+        alert('Session expired. Please login again.');
+        localStorage.clear();
+        router.navigate(['/landing']);
       }
-    });
-  }
 
-  return next(req);
+      return throwError(() => error);
+    })
+  );
 };

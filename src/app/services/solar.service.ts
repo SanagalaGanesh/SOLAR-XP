@@ -31,7 +31,7 @@ export class SolarService {
   /**
    * 🔹 Submit a new solar quote
    */
-  
+
 submitQuote(payload: {
   userId: number;
   mobile: string;
@@ -41,7 +41,7 @@ submitQuote(payload: {
   selectedWatts: number[];
 }) {
   return this.http.post(
-    '/api/services/app/Solar/SubmitQuote',
+    'http://192.168.168.76:5000/api/services/app/Solar/SubmitQuote',
     payload
   );
 }

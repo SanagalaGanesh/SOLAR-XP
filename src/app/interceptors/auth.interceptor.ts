@@ -2,9 +2,9 @@ import { HttpInterceptorFn } from '@angular/common/http';
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
 
-  const role = localStorage.getItem('ROLE'); // 'ADMIN' or 'USER'
+  const role = localStorage.getItem('ROLE'); // optional
   const adminToken = localStorage.getItem('ADMIN_TOKEN');
-  const userToken  = localStorage.getItem('access_token');
+  const userToken  = localStorage.getItem('accessToken'); // ✅ FIXED
 
   let token: string | null = null;
 
