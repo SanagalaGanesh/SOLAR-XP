@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { CanActivate, Router, UrlTree } from '@angular/router';
+import { CanActivate, Router } from '@angular/router';
 
 @Injectable({
   providedIn: 'root'
@@ -7,15 +7,18 @@ import { CanActivate, Router, UrlTree } from '@angular/router';
 export class AuthGuard implements CanActivate {
 
   constructor(private router: Router) {}
+canActivate(): boolean {
+  const token = localStorage.getItem('accessToken');
 
-  canActivate(): boolean | UrlTree {
-    const token = localStorage.getItem('accessToken'); // ✅ FIXED
-
-    if (token) {
-      return true;
-    }
-
-    // ❌ Not logged in
-    return this.router.parseUrl('/landing');
+  if (token && token !== 'undefined' && token !== 'null') {
+    return true;
   }
+
+  this.router.navigate(['/login'], {
+    queryParams: { reason: 'session-expired' }
+  });
+  return false;
+}
+
+
 }

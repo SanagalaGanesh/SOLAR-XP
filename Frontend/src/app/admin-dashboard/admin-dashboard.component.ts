@@ -159,10 +159,8 @@ export class AdminDashboardComponent implements OnInit {
   }
 
 logout(): void {
-  localStorage.removeItem('accessToken');
+  localStorage.removeItem('ADMIN_TOKEN');
   localStorage.removeItem('ROLE');
-  localStorage.removeItem('userId');
-
   this.router.navigateByUrl('/admin-login', { replaceUrl: true });
 }
 
@@ -189,5 +187,8 @@ logout(): void {
     this.adminService.getPendingQuotes().subscribe((res: any) => {
       this.pendingOrders = res.result?.length || 0;
     });
+    this.adminService.getApprovedQuotes().subscribe((res: any) => {
+    this.approvedOrders = res.result?.length || 0;
+  });
   }
 }

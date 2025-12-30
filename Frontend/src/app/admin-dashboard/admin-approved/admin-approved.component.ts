@@ -14,7 +14,7 @@ import { AdminService } from '../../services/admin.service';
         <table>
           <thead>
             <tr>
-              <th>Quote ID</th>
+              <th>S.No</th>
               <th>Customer</th>
               <th>Solar Model</th>
               <th>Price</th>
@@ -23,8 +23,8 @@ import { AdminService } from '../../services/admin.service';
           </thead>
 
           <tbody>
-            <tr *ngFor="let q of approvedQuotes">
-              <td>#{{ q.headerId }}</td>
+            <tr *ngFor="let q of approvedQuotes; let i = index">
+  <td>{{ i + 1 }}</td>
 
               <td>
                 <b>{{ q.customerName }}</b><br />
