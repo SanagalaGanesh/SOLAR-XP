@@ -266,10 +266,16 @@ import { SolarService } from '../services/solar.service';
                 Mobile Number
               </label>
               <input 
-                type="tel" 
-                class="form-input"
-                [(ngModel)]="mobile"
-                placeholder="Enter 10-digit mobile number">
+  type="tel"
+  class="form-input"
+  name="mobile"
+  [(ngModel)]="mobile"
+  #mobileCtrl="ngModel"
+  placeholder="Enter 10-digit mobile number"
+  required
+  pattern="^[6-9][0-9]{9}$"
+  maxlength="10">
+
             </div>
             
             <div class="form-group">

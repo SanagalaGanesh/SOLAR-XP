@@ -7,16 +7,18 @@ import { CanActivate, Router } from '@angular/router';
 export class AuthGuard implements CanActivate {
 
   constructor(private router: Router) {}
+canActivate(): boolean {
+  const token = localStorage.getItem('accessToken');
 
-  canActivate(): boolean {
-    const token = localStorage.getItem('accessToken');
-
-    if (token) {
-      return true;
-    }
-
-    alert('Session expired. Please login again.');
-    this.router.navigate(['/login']);
-    return false;
+  if (token && token !== 'undefined' && token !== 'null') {
+    return true;
   }
+
+  this.router.navigate(['/login'], {
+    queryParams: { reason: 'session-expired' }
+  });
+  return false;
+}
+
+
 }

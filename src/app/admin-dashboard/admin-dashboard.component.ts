@@ -187,5 +187,8 @@ logout(): void {
     this.adminService.getPendingQuotes().subscribe((res: any) => {
       this.pendingOrders = res.result?.length || 0;
     });
+    this.adminService.getApprovedQuotes().subscribe((res: any) => {
+    this.approvedOrders = res.result?.length || 0;
+  });
   }
 }
