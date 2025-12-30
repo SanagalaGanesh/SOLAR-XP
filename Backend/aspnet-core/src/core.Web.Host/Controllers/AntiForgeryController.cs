@@ -32,4 +32,4 @@ namespace core.Web.Host.Controllers
             _antiForgeryManager.SetCookie(HttpContext);
         }
     }
-}
+}     
