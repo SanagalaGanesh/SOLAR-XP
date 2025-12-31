@@ -17,9 +17,16 @@
   color: white;
   padding: 20px 16px;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  overflow: hidden;
-  position: relative;
+  overflow-y: auto;
+
+  /* ✅ STICKY SIDEBAR */
+  position: sticky;
+  top: 0;
+  height: 100vh;
+
+  z-index: 100;
 }
+
 
 .sidebar-collapsed .sidebar {
   width: 80px;

@@ -10,7 +10,10 @@ export class AdminService {
   private readonly API_URL =
     'http://192.168.168.76:5000/api/services/app/Solar';
 
-  constructor(private http: HttpClient) {}
+ //Angular injects HttpClient automatically
+
+//This is called Dependency Injection
+    constructor(private http: HttpClient) {}
 
   // =========================
   // 👥 CUSTOMERS

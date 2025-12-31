@@ -1,0 +1,70 @@
+{
+  "hash": "24369319",
+  "configHash": "1e1f4f26",
+  "lockfileHash": "8b0a19ae",
+  "browserHash": "bd0370d5",
+  "optimized": {
+    "@angular/common": {
+      "src": "../../../../../../node_modules/@angular/common/fesm2022/common.mjs",
+      "file": "@angular_common.js",
+      "fileHash": "9a253eac",
+      "needsInterop": false
+    },
+    "@angular/common/http": {
+      "src": "../../../../../../node_modules/@angular/common/fesm2022/http.mjs",
+      "file": "@angular_common_http.js",
+      "fileHash": "b4a28dbc",
+      "needsInterop": false
+    },
+    "@angular/core": {
+      "src": "../../../../../../node_modules/@angular/core/fesm2022/core.mjs",
+      "file": "@angular_core.js",
+      "fileHash": "9c683e05",
+      "needsInterop": false
+    },
+    "@angular/forms": {
+      "src": "../../../../../../node_modules/@angular/forms/fesm2022/forms.mjs",
+      "file": "@angular_forms.js",
+      "fileHash": "9becd189",
+      "needsInterop": false
+    },
+    "@angular/platform-browser": {
+      "src": "../../../../../../node_modules/@angular/platform-browser/fesm2022/platform-browser.mjs",
+      "file": "@angular_platform-browser.js",
+      "fileHash": "1597e041",
+      "needsInterop": false
+    },
+    "@angular/platform-browser/animations": {
+      "src": "../../../../../../node_modules/@angular/platform-browser/fesm2022/animations.mjs",
+      "file": "@angular_platform-browser_animations.js",
+      "fileHash": "1bf5b391",
+      "needsInterop": false
+    },
+    "@angular/router": {
+      "src": "../../../../../../node_modules/@angular/router/fesm2022/router.mjs",
+      "file": "@angular_router.js",
+      "fileHash": "2fe9a10c",
+      "needsInterop": false
+    }
+  },
+  "chunks": {
+    "chunk-WTHYJ4P4": {
+      "file": "chunk-WTHYJ4P4.js"
+    },
+    "chunk-MKB72TFJ": {
+      "file": "chunk-MKB72TFJ.js"
+    },
+    "chunk-XX36G7I7": {
+      "file": "chunk-XX36G7I7.js"
+    },
+    "chunk-3MZQG37H": {
+      "file": "chunk-3MZQG37H.js"
+    },
+    "chunk-VBBQ2GWJ": {
+      "file": "chunk-VBBQ2GWJ.js"
+    },
+    "chunk-MHVRFEGU": {
+      "file": "chunk-MHVRFEGU.js"
+    }
+  }
+}

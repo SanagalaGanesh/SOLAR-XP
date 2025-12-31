@@ -81,6 +81,46 @@ import { ForgotPasswordComponent } from '../forgot-password/forgot-password.comp
 
       </div>
     </section>
+<!-- SOLAR CHATBOT SECTION -->
+<section class="chatbot-section">
+  <div class="chatbot-container">
+
+    <div class="chatbot-content">
+      <h2 class="chatbot-title">
+        Have Questions About Solar Panels?
+      </h2>
+
+      <p class="chatbot-subtitle">
+        Not sure which solar model is right for your home or business?
+        Ask our solar assistant and get instant, expert guidance.
+      </p>
+
+      <ul class="chatbot-features">
+        <li>✔ Compare Mono, Poly & Thin Film panels</li>
+        <li>✔ Get recommendations based on your needs</li>
+        <li>✔ Understand pricing, efficiency & subsidies</li>
+      </ul>
+
+     <button class="chatbot-btn" (click)="openSolarAssistant()">
+  💬 Ask the Solar Assistant
+</button>
+
+    </div>
+
+    <div class="chatbot-visual">
+      <div class="chatbot-card">
+        <p class="bot-question">
+          “Which solar panel is best for my rooftop?”
+        </p>
+        <p class="bot-answer">
+          Based on your usage and space, Monocrystalline panels offer the
+          highest efficiency for residential rooftops.
+        </p>
+      </div>
+    </div>
+
+  </div>
+</section>
 
     <!-- LOGIN MODAL -->
     <app-login
@@ -163,6 +203,18 @@ export class LandingComponent implements OnInit {
     this.showForgotPassword = false;
     this.refreshAuthState(); // ✅ IMPORTANT
   }
+openSolarAssistant(): void {
+  const token = localStorage.getItem('accessToken');
+
+  if (!token) {
+    // ❌ Not logged in → open login
+    this.openLogin();
+    return;
+  }
+
+  // ✅ Logged in → go to chatbot page / open chatbot
+  this.router.navigateByUrl('/solar-assistant');
+}
 
   goToModel(type: 'mono' | 'poly' | 'thin'): void {
     this.router.navigate(['/solar', type]);
