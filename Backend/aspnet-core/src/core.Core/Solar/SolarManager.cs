@@ -1,9 +1,10 @@
-﻿using Abp.Domain.Repositories;
+﻿using Abp.Collections.Extensions;
+using Abp.Domain.Repositories;
 using Abp.Domain.Services;
 using Abp.Runtime.Caching;
 using Abp.UI;
+using core.Solar.Dto; 
 using core.SolarEntities;
-using core.Authorization.Users;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -12,6 +13,14 @@ using System.Threading.Tasks;
 
 namespace core.Solar
 {
+  
+    public enum QuoteStatus
+    {
+        Pending,
+        Approved,
+        Ordered
+    }
+
     public class SolarManager : DomainService
     {
         private readonly IRepository<QuoteHeader> _headerRepo;
@@ -19,6 +28,11 @@ namespace core.Solar
         private readonly IRepository<SolarProduct> _productRepo;
         private readonly IRepository<ClientOrder> _orderRepo;
         private readonly ICacheManager _cacheManager;
+
+        private const string Cache_Products = "SolarProductsCache";
+        private const string Cache_UserQuotes = "UserQuotesCache";
+        private const string CacheKey_AllProducts = "AllProductsList";
+        private const decimal LocationChargePerWatt = 20;
 
         public SolarManager(
             IRepository<QuoteHeader> headerRepo,
@@ -34,23 +48,21 @@ namespace core.Solar
             _cacheManager = cacheManager;
         }
 
+       
         // 1. CUSTOMER: SUBMIT QUOTE
+
         public async Task<string> SubmitQuoteAsync(long userId, string mobile, string addressLine1, string addressLine2, List<string> selectedTypes, List<int> selectedWatts)
         {
-            if (selectedTypes == null || !selectedTypes.Any()) throw new UserFriendlyException("Select at least one Panel Type!");
-            if (selectedWatts == null || !selectedWatts.Any()) throw new UserFriendlyException("Select at least one Wattage!");
+            if (selectedTypes.IsNullOrEmpty()) throw new UserFriendlyException("Select at least one Panel Type!");
+            if (selectedWatts.IsNullOrEmpty()) throw new UserFriendlyException("Select at least one Wattage!");
 
-            bool productsFound = false;
-            foreach (var type in selectedTypes)
-            {
-                foreach (var watt in selectedWatts)
-                {
-                    var count = await _productRepo.CountAsync(p => p.Type == type && p.Watt == watt);
-                    if (count > 0) productsFound = true;
-                }
-            }
+            
+            var availableProducts = await _productRepo.GetAll()
+                .Where(p => selectedTypes.Contains(p.Type) && selectedWatts.Contains(p.Watt))
+                .ToListAsync();
 
-            if (!productsFound) throw new UserFriendlyException("Selected Product Combinations not found in Database!");
+            if (!availableProducts.Any())
+                throw new UserFriendlyException("Selected Product Combinations not found in Database!");
 
             var header = new QuoteHeader
             {
@@ -58,63 +70,64 @@ namespace core.Solar
                 Mobile = mobile,
                 AddressLine1 = addressLine1,
                 AddressLine2 = addressLine2,
-                CreationTime = DateTime.Now
+                CreationTime = DateTime.Now,
+                QuoteItems = new List<QuoteItem>()
             };
-            int headerId = await _headerRepo.InsertAndGetIdAsync(header);
 
-            int itemsAdded = 0;
             foreach (var type in selectedTypes)
             {
                 foreach (var watt in selectedWatts)
                 {
-                    var product = await _productRepo.FirstOrDefaultAsync(p => p.Type == type && p.Watt == watt);
+                    var product = availableProducts.FirstOrDefault(p => p.Type == type && p.Watt == watt);
 
                     if (product != null)
                     {
-                        decimal locationCharge = product.Watt * 10;
-                        decimal finalPrice = (product.BasePrice + locationCharge) - product.Subsidy;
+                        decimal finalPrice = CalculateFinalPrice(product);
 
-                        var item = new QuoteItem
+                        header.QuoteItems.Add(new QuoteItem
                         {
-                            QuoteHeaderId = headerId,
                             SolarProductId = product.Id,
                             CalculatedPrice = finalPrice,
                             IsApproved = false,
-                            Status = "Pending"
-                        };
-                        await _itemRepo.InsertAsync(item);
-                        itemsAdded++;
+                            Status = QuoteStatus.Pending.ToString()
+                        });
                     }
                 }
             }
 
-            if (itemsAdded == 0)
-            {
-                await _headerRepo.DeleteAsync(headerId);
-                throw new UserFriendlyException("Failed to add items.");
-            }
+            if (!header.QuoteItems.Any())
+                throw new UserFriendlyException("Failed to match any valid products.");
 
-            // Clear User Cache
-            await _cacheManager.GetCache("UserQuotesCache").RemoveAsync($"UserDashboard_{userId}");
+            int headerId = await _headerRepo.InsertAndGetIdAsync(header);
+
+            // Invalidate Cache for this user
+            await InvalidateUserCache(userId);
 
             return $"Success! Quote Submitted. ID: {headerId}";
         }
 
-        // 2. ADMIN: GET REQUESTS
-        public object GetAdminRequests(string statusType)
+
+        // 2. ADMIN: GET REQUESTS 
+        public List<AdminRequestDto> GetAdminRequests(string statusType)
         {
             var query = _headerRepo.GetAll()
+                        .AsNoTracking()
                         .Include(h => h.User)
                         .Include(h => h.QuoteItems).ThenInclude(i => i.SolarProduct)
                         .OrderByDescending(h => h.CreationTime)
                         .AsQueryable();
 
-            if (statusType == "Pending") query = query.Where(h => h.QuoteItems.Any(i => !i.IsApproved));
-            else if (statusType == "Approved") query = query.Where(h => h.QuoteItems.All(i => i.IsApproved) && h.QuoteItems.Count > 0);
+            if (statusType == QuoteStatus.Pending.ToString())
+            {
+                query = query.Where(h => h.QuoteItems.Any(i => !i.IsApproved));
+            }
+            else if (statusType == QuoteStatus.Approved.ToString())
+            {
+                query = query.Where(h => h.QuoteItems.All(i => i.IsApproved) && h.QuoteItems.Count > 0);
+            }
 
-            var list = query.ToList();
-
-            return list.Select(h => new
+           
+            return query.Select(h => new AdminRequestDto
             {
                 HeaderId = h.Id,
                 CustomerName = h.User != null ? (h.User.Name + " " + h.User.Surname) : "Guest",
@@ -122,7 +135,7 @@ namespace core.Solar
                 Address = $"{h.AddressLine1}, {h.AddressLine2}",
                 Date = h.CreationTime.ToString("dd-MMM-yyyy"),
                 TotalAmount = h.QuoteItems.Sum(i => i.CalculatedPrice).ToString("N0"),
-                Items = h.QuoteItems.Select(i => new
+                Items = h.QuoteItems.Select(i => new AdminRequestItemDto
                 {
                     ItemId = i.Id,
                     ProductName = $"{i.SolarProduct.Type} - {i.SolarProduct.Watt}W",
@@ -132,126 +145,142 @@ namespace core.Solar
             }).ToList();
         }
 
+
         // 3. ADMIN: APPROVE
+       
         public async Task<string> ApproveQuoteHeaderAsync(int headerId)
         {
-            // Step A: First, Header ni techuko (Endukante manaki UserId kavali cache clear cheyadaniki)
-            var header = await _headerRepo.FirstOrDefaultAsync(headerId);
+            var header = await _headerRepo.GetAllIncluding(h => h.QuoteItems)
+                                          .FirstOrDefaultAsync(h => h.Id == headerId);
+
             if (header == null) throw new UserFriendlyException("Request not found!");
+            if (!header.QuoteItems.Any()) throw new UserFriendlyException("No items found!");
 
-            // Step B: Items ni Approve chey (Existing Logic)
-            var items = await _itemRepo.GetAllListAsync(x => x.QuoteHeaderId == headerId);
-
-            if (items == null || items.Count == 0)
-                throw new UserFriendlyException("No items found for this request!");
-
-            foreach (var item in items)
+            foreach (var item in header.QuoteItems)
             {
                 item.IsApproved = true;
-                item.Status = "Approved";
+                item.Status = QuoteStatus.Approved.ToString();
             }
 
-            await _cacheManager.GetCache("UserQuotesCache").RemoveAsync($"UserDashboard_{header.UserId}");
+            await InvalidateUserCache(header.UserId);
 
             return "Quote Request Fully Approved!";
         }
 
-        // 4. ADMIN: ORDERS
-        public object GetAdminOrders()
-        {
-            var orders = _orderRepo.GetAll()
-                          .Include(o => o.QuoteItem).ThenInclude(i => i.SolarProduct)
-                          .Include(o => o.QuoteItem).ThenInclude(i => i.QuoteHeader).ThenInclude(h => h.User)
-                          .OrderByDescending(o => o.OrderDate)
-                          .ToList();
 
-            return orders.Select(o => new
-            {
-                OrderId = o.Id,
-                CustomerName = o.QuoteItem.QuoteHeader.User != null ? (o.QuoteItem.QuoteHeader.User.Name + " " + o.QuoteItem.QuoteHeader.User.Surname) : "Unknown",
-                Mobile = o.QuoteItem.QuoteHeader.Mobile,
-                Address = o.QuoteItem.QuoteHeader.AddressLine2,
-                ModelName = $"{o.QuoteItem.SolarProduct.Type} - {o.QuoteItem.SolarProduct.Watt}W",
-                Amount = o.QuoteItem.CalculatedPrice.ToString("N0"),
-                Status = o.OrderStatus,
-                Date = o.OrderDate.ToString("dd-MMM-yyyy")
-            }).ToList();
+        // 4. ADMIN: ORDERS (Returns DTO List)
+    
+        public List<AdminOrderDto> GetAdminOrders()
+        {
+            return _orderRepo.GetAll()
+                   .AsNoTracking()
+                   .Include(o => o.QuoteItem).ThenInclude(i => i.SolarProduct)
+                   .Include(o => o.QuoteItem).ThenInclude(i => i.QuoteHeader).ThenInclude(h => h.User)
+                   .OrderByDescending(o => o.OrderDate)
+                   .Select(o => new AdminOrderDto
+                   {
+                       OrderId = o.Id,
+                       CustomerName = o.QuoteItem.QuoteHeader.User != null ? (o.QuoteItem.QuoteHeader.User.Name + " " + o.QuoteItem.QuoteHeader.User.Surname) : "Unknown",
+                       Mobile = o.QuoteItem.QuoteHeader.Mobile,
+                       Address = o.QuoteItem.QuoteHeader.AddressLine2,
+                       ModelName = $"{o.QuoteItem.SolarProduct.Type} - {o.QuoteItem.SolarProduct.Watt}W",
+                       Amount = o.QuoteItem.CalculatedPrice.ToString("N0"),
+                       Status = o.OrderStatus,
+                       Date = o.OrderDate.ToString("dd-MMM-yyyy")
+                   }).ToList();
         }
 
-        // 5. CUSTOMER: GET MY QUOTES
-        public object GetMyQuotes(long userId)
+      
+        // 5. CUSTOMER: GET MY QUOTES 
+     
+        public List<UserQuoteDto> GetMyQuotes(long userId)
         {
             string cacheKey = $"UserDashboard_{userId}";
 
-            var quotes = _cacheManager.GetCache("UserQuotesCache");
-
-            //_cacheManager.Dispose();
-
-            return _cacheManager
-                .GetCache("UserQuotesCache")
+            
+            return (List<UserQuoteDto>)_cacheManager
+                .GetCache(Cache_UserQuotes)
                 .Get(cacheKey, (key) =>
                 {
                     var query = _headerRepo.GetAll()
-                                .Include(h => h.QuoteItems)
-                                .ThenInclude(i => i.SolarProduct)
+                                .AsNoTracking()
+                                .Include(h => h.QuoteItems).ThenInclude(i => i.SolarProduct)
                                 .Where(h => h.UserId == userId)
                                 .OrderByDescending(h => h.CreationTime)
                                 .ToList();
 
-                    return query.Select(h => new
+                    
+                    return query.Select(h => new UserQuoteDto
                     {
                         HeaderId = h.Id,
                         Date = h.CreationTime.ToString("dd-MMM-yyyy"),
                         Address = h.AddressLine1 + ", " + h.AddressLine2,
-                        Items = h.QuoteItems.Select(i => new
+                        Items = h.QuoteItems.Select(i => new UserQuoteItemDto
                         {
                             ItemId = i.Id,
                             Product = $"{i.SolarProduct.Type} - {i.SolarProduct.Watt}W",
                             Price = i.IsApproved ? i.CalculatedPrice.ToString("N0") : "TBD",
                             Status = i.Status,
-                            CanBuy = i.IsApproved && i.Status != "Ordered"
+                            CanBuy = i.IsApproved && i.Status != QuoteStatus.Ordered.ToString()
                         }).ToList()
                     }).ToList();
                 });
         }
 
+  
         // 6. CUSTOMER: PLACE ORDER
+
         public async Task<string> PlaceOrderAsync(int itemId)
         {
-            var item = await _itemRepo.GetAllIncluding(x => x.QuoteHeader).FirstOrDefaultAsync(x => x.Id == itemId);
-            if (item == null) throw new UserFriendlyException("Item not found!");
+            var item = await _itemRepo.GetAllIncluding(x => x.QuoteHeader)
+                                      .FirstOrDefaultAsync(x => x.Id == itemId);
 
-            var order = new ClientOrder { QuoteItemId = itemId, OrderDate = DateTime.Now, OrderStatus = "Placed" };
+            if (item == null) throw new UserFriendlyException("Item not found!");
+            if (!item.IsApproved) throw new UserFriendlyException("Price not approved yet!");
+
+            if (item.Status == QuoteStatus.Ordered.ToString())
+                throw new UserFriendlyException("Already ordered!");
+
+            var order = new ClientOrder
+            {
+                QuoteItemId = itemId,
+                OrderDate = DateTime.Now,
+                OrderStatus = "Placed"
+            };
             await _orderRepo.InsertAsync(order);
 
-            item.Status = "Ordered";
+            item.Status = QuoteStatus.Ordered.ToString();
             await _itemRepo.UpdateAsync(item);
 
-            if (item.QuoteHeader != null) await _cacheManager.GetCache("UserQuotesCache").RemoveAsync($"UserDashboard_{item.QuoteHeader.UserId}");
+            if (item.QuoteHeader != null)
+            {
+                await InvalidateUserCache(item.QuoteHeader.UserId);
+            }
 
             return "Order Placed Successfully!";
         }
 
-
-
-        // A. GET ALL PRODUCTS
+        // A. GET ALL PRODUCTS 
+        
         public async Task<List<SolarProduct>> GetAllProducts()
         {
-            //var solarproducts = _cacheManager.GetCache("SolarProductsCache");
-            //    var data= await solarproducts.GetOrDefaultAsync("AllProductsList");
-            //_cacheManager.Dispose();
-
-            return (List<SolarProduct>)await _cacheManager
-                .GetCache("SolarProductsCache")
-                .GetAsync("AllProductsList", async (key) =>
-                {
-                    return await _productRepo.GetAll()
+            var cache = _cacheManager.GetCache(Cache_Products);
+            var cached = await cache.GetAsync(CacheKey_AllProducts, async key =>
+            {
+                var products = await _productRepo.GetAll()
+                                .AsNoTracking()
                                 .OrderBy(p => p.Id)
                                 .ToListAsync();
-                });
+                return products;
+            });
+
+            return cached as List<SolarProduct>;
         }
 
-        // B. GET BY ID
+        
+        // CRUD Operations
+   
+
         public async Task<SolarProduct> GetProductByIdAsync(int id)
         {
             var product = await _productRepo.FirstOrDefaultAsync(id);
@@ -259,18 +288,22 @@ namespace core.Solar
             return product;
         }
 
-        // C. CREATE
         public async Task CreateProductAsync(string type, int watt, decimal basePrice, decimal subsidy)
         {
             var existing = await _productRepo.FirstOrDefaultAsync(p => p.Type == type && p.Watt == watt);
-            if (existing != null) throw new UserFriendlyException("Product exists!");
+            if (existing != null) throw new UserFriendlyException("Product already exists!");
 
-            var product = new SolarProduct { Type = type, Watt = watt, BasePrice = basePrice, Subsidy = subsidy };
-            await _productRepo.InsertAsync(product);
-            await _cacheManager.GetCache("SolarProductsCache").ClearAsync();
+            await _productRepo.InsertAsync(new SolarProduct
+            {
+                Type = type,
+                Watt = watt,
+                BasePrice = basePrice,
+                Subsidy = subsidy
+            });
+
+            await InvalidateProductsCache();
         }
 
-        // D. UPDATE
         public async Task UpdateProductAsync(int id, string type, int watt, decimal basePrice, decimal subsidy)
         {
             var product = await _productRepo.GetAsync(id);
@@ -281,17 +314,36 @@ namespace core.Solar
             product.BasePrice = basePrice;
             product.Subsidy = subsidy;
             await _productRepo.UpdateAsync(product);
-            await _cacheManager.GetCache("SolarProductsCache").ClearAsync();
+            await InvalidateProductsCache();
         }
 
-        // E. DELETE
         public async Task DeleteProductAsync(int id)
         {
             var isUsed = await _itemRepo.CountAsync(i => i.SolarProductId == id);
-            if (isUsed > 0) throw new UserFriendlyException("Cannot delete: Used in quotes.");
+            if (isUsed > 0) throw new UserFriendlyException("Cannot delete: Product used in existing quotes.");
 
             await _productRepo.DeleteAsync(id);
-            await _cacheManager.GetCache("SolarProductsCache").ClearAsync();
+            await InvalidateProductsCache();
+        }
+
+        // PRIVATE HELPERS
+       
+
+
+        private decimal CalculateFinalPrice(SolarProduct product)
+        {
+            decimal locationCharge = product.Watt * LocationChargePerWatt;
+            return (product.BasePrice + locationCharge) - product.Subsidy;
+        }
+
+        private async Task InvalidateUserCache(long userId)
+        {
+            await _cacheManager.GetCache(Cache_UserQuotes).RemoveAsync($"UserDashboard_{userId}");
+        }
+
+        private async Task InvalidateProductsCache()
+        {
+            await _cacheManager.GetCache(Cache_Products).ClearAsync();
         }
     }
 }
