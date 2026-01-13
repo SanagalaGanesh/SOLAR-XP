@@ -1,1 +1,66 @@
-<p>signup works!</p>
+<div class="modal-backdrop" (click)="close.emit()">
+  <div class="auth-card" (click)="$event.stopPropagation()">
+
+    <!-- Close -->
+    <button
+  class="close-btn"
+  (click)="onClose($event)"
+>
+  ✕
+</button>
+
+
+    <!-- Icon + Title -->
+    <div class="icon">🌞</div>
+    <h2>Create Account</h2>
+
+    <form [formGroup]="form" (ngSubmit)="createAccount()">
+
+      <input
+        type="text"
+        placeholder="Username"
+        formControlName="userName"
+      />
+
+      <div class="row">
+        <input
+          type="text"
+          placeholder="First Name"
+          formControlName="name"
+        />
+
+        <input
+          type="text"
+          placeholder="Last Name"
+          formControlName="surname"
+        />
+      </div>
+
+      <input
+        type="email"
+        placeholder="Email"
+        formControlName="emailAddress"
+      />
+
+      <input
+        type="password"
+        placeholder="Password"
+        formControlName="password"
+      />
+
+      <button type="submit" [disabled]="loading">
+        {{ loading ? 'Creating...' : 'Create Account' }}
+      </button>
+    </form>
+
+    <p class="error" *ngIf="errorMessage">{{ errorMessage }}</p>
+    <p class="success" *ngIf="successMessage">{{ successMessage }}</p>
+
+    <p class="footer-text">
+      Already have an account?
+      <span (click)="onLoginClick($event)">Login</span>
+
+    </p>
+
+  </div>
+</div>

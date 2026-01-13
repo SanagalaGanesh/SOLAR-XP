@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   Router,
@@ -7,6 +7,7 @@ import {
   RouterOutlet
 } from '@angular/router';
 import { AdminService } from '../services/admin.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-admin-dashboard',
@@ -17,129 +18,41 @@ import { AdminService } from '../services/admin.service';
     RouterLinkActive,
     RouterOutlet
   ],
-  template: `
-  <div class="dashboard" [class.sidebar-collapsed]="!sidebarOpen">
-
-    <!-- SIDEBAR -->
-    <aside class="sidebar">
-      <div class="profile">
-        <div class="avatar">A</div>
-        <h3 *ngIf="sidebarOpen">ADMIN</h3>
-      </div>
-
-      <ul>
-        <li routerLink="/admin" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
-          <span>🏠</span>
-          <span *ngIf="sidebarOpen">Dashboard</span>
-        </li>
-
-        <li routerLink="/admin/customers" routerLinkActive="active">
-          <span>👥</span>
-          <span *ngIf="sidebarOpen">Total Customers</span>
-        </li>
-
-        <li routerLink="/admin/orders" routerLinkActive="active">
-          <span>📦</span>
-          <span *ngIf="sidebarOpen">Total Orders</span>
-        </li>
-
-        <li routerLink="/admin/approved" routerLinkActive="active">
-          <span>✅</span>
-          <span *ngIf="sidebarOpen">Approved Orders</span>
-        </li>
-
-        <li routerLink="/admin/pending" routerLinkActive="active">
-          <span>⏳</span>
-          <span *ngIf="sidebarOpen">Pending Orders</span>
-        </li>
-        <li routerLink="/admin/products" routerLinkActive="active">
-  <span>📦</span>
-  <span *ngIf="sidebarOpen">Products</span>
-</li>
-
-
-        <li (click)="logout()">
-          <span>🚪</span>
-          <span *ngIf="sidebarOpen">Logout</span>
-        </li>
-      </ul>
-    </aside>
-
-    <!-- MAIN CONTENT -->
-    <main class="content">
-
-      <!-- TOP BAR -->
-      <header class="topbar">
-        <button class="toggle-btn" (click)="toggleSidebar()">☰</button>
-        <h2>Admin Dashboard</h2>
-      </header>
-
-      <!-- DASHBOARD HOME -->
-      <ng-container *ngIf="isDashboardRoute()">
-
-        <div class="cards">
-          <div class="card gradient-blue">
-            <h4>Total Customers</h4>
-            <p>{{ totalCustomers }}</p>
-          </div>
-
-          <div class="card gradient-green">
-            <h4>Total Orders</h4>
-            <p>{{ totalOrders }}</p>
-          </div>
-
-          <div class="card gradient-orange">
-            <h4>Approved Orders</h4>
-            <p>{{ approvedOrders }}</p>
-          </div>
-
-          <div class="card gradient-red">
-            <h4>Pending Orders</h4>
-            <p>{{ pendingOrders }}</p>
-          </div>
-        </div>
-
-        <div class="charts">
-          <div class="chart-box">
-            <h4>Monthly Orders</h4>
-            <div class="bar-chart">
-              <div style="height: 60%"></div>
-              <div style="height: 80%"></div>
-              <div style="height: 50%"></div>
-              <div style="height: 90%"></div>
-              <div style="height: 70%"></div>
-            </div>
-          </div>
-
-          <div class="chart-box">
-            <h4>Customer Growth</h4>
-            <svg viewBox="0 0 100 50" class="line-chart">
-              <polyline
-                fill="none"
-                stroke="#6366f1"
-                stroke-width="3"
-                points="0,40 20,30 40,35 60,20 80,25 100,10"
-              />
-            </svg>
-          </div>
-        </div>
-
-      </ng-container>
-
-      <router-outlet></router-outlet>
-    </main>
-  </div>
-  `,
+  templateUrl: './admin-dashboard.component.html',
   styleUrls: ['./admin-dashboard.component.scss']
 })
-export class AdminDashboardComponent implements OnInit {
-
+export class AdminDashboardComponent implements OnInit, OnDestroy {
   sidebarOpen = true;
 
+  // Dashboard stats
   totalCustomers = 0;
   totalOrders = 0;
   approvedOrders = 0;
   pendingOrders = 0;
+  revenue = 0;
+  energyGenerated = 0; // MWh
+  co2Reduction = 0; // tons
+
+  // Chart data
+  monthlyOrders = [65, 80, 50, 90, 70, 85, 60, 95, 75, 85, 90, 100];
+  monthlyRevenue = [1200, 1800, 1500, 2200, 1900, 2500, 2100, 2800, 2400, 3000, 3200, 3500];
+  panelTypes = [
+    { name: 'Monocrystalline', value: 45 },
+    { name: 'Polycrystalline', value: 35 },
+    { name: 'Thin Film', value: 20 }
+  ];
+
+  // Energy production data (simulated)
+  energyProduction = [
+    { month: 'Jan', value: 1200 },
+    { month: 'Feb', value: 1400 },
+    { month: 'Mar', value: 1800 },
+    { month: 'Apr', value: 2200 },
+    { month: 'May', value: 2800 },
+    { month: 'Jun', value: 3200 }
+  ];
+
+  private subscriptions: Subscription[] = [];
 
   constructor(
     private router: Router,
@@ -148,6 +61,11 @@ export class AdminDashboardComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadDashboardCounts();
+    this.simulateLiveData();
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.forEach(sub => sub.unsubscribe());
   }
 
   toggleSidebar(): void {
@@ -158,37 +76,88 @@ export class AdminDashboardComponent implements OnInit {
     return this.router.url === '/admin';
   }
 
-logout(): void {
-  localStorage.removeItem('ADMIN_TOKEN');
-  localStorage.removeItem('ROLE');
-  this.router.navigateByUrl('/admin-login', { replaceUrl: true });
-}
+  logout(): void {
+    localStorage.removeItem('ADMIN_TOKEN');
+    localStorage.removeItem('ROLE');
+    this.router.navigateByUrl('/admin-login', { replaceUrl: true });
+  }
 
-
-
-  // 🔢 LOAD COUNTS FROM API
   loadDashboardCounts(): void {
-
     // Customers
-    this.adminService.getCustomers().subscribe((res: any) => {
-      this.totalCustomers = res.result?.items?.length || 0;
-    });
+    this.subscriptions.push(
+      this.adminService.getCustomers().subscribe((res: any) => {
+        this.totalCustomers = res.result?.items?.length || 0;
+      })
+    );
 
     // Orders
-    this.adminService.getAdminOrders().subscribe((res: any) => {
-      const orders = res.result || [];
-      this.totalOrders = orders.length;
-      this.approvedOrders = orders.filter(
-        (o: any) => o.status === 'Ordered'
-      ).length;
-    });
+    this.subscriptions.push(
+      this.adminService.getAdminOrders().subscribe((res: any) => {
+        const orders = res.result || [];
+        this.totalOrders = orders.length;
+        this.approvedOrders = orders.filter(
+          (o: any) => o.status === 'Ordered'
+        ).length;
+        
+        // Calculate revenue (example: $500 per order)
+        this.revenue = orders.length * 500;
+      })
+    );
 
     // Pending Quotes
-    this.adminService.getPendingQuotes().subscribe((res: any) => {
-      this.pendingOrders = res.result?.length || 0;
-    });
-    this.adminService.getApprovedQuotes().subscribe((res: any) => {
-    this.approvedOrders = res.result?.length || 0;
-  });
+    this.subscriptions.push(
+      this.adminService.getPendingQuotes().subscribe((res: any) => {
+        this.pendingOrders = res.result?.length || 0;
+      })
+    );
+
+    this.subscriptions.push(
+      this.adminService.getApprovedQuotes().subscribe((res: any) => {
+        this.approvedOrders = res.result?.length || 0;
+      })
+    );
   }
+
+  simulateLiveData(): void {
+    // Simulate energy generated (in MWh)
+    this.energyGenerated = Math.floor(Math.random() * 5000) + 1000;
+    
+    // CO2 reduction calculation (approx 0.5 tons per MWh)
+    this.co2Reduction = Math.round(this.energyGenerated * 0.5);
+    
+    // Update every 30 seconds for live feel
+    setInterval(() => {
+      this.energyGenerated += Math.floor(Math.random() * 100);
+      this.co2Reduction = Math.round(this.energyGenerated * 0.5);
+    }, 30000);
+  }
+
+  // Helper methods for charts
+  getMaxValue(arr: number[]): number {
+    return Math.max(...arr) * 1.1; // 10% padding
+  }
+
+  getBarHeight(value: number, max: number): number {
+    return (value / max) * 100;
+  }
+
+  getRevenueColor(value: number): string {
+    if (value > 2500) return '#10b981'; // green
+    if (value > 1500) return '#f59e0b'; // amber
+    return '#ef4444'; // red
+  }
+
+  formatRevenue(value: number): string {
+    return `$${value.toLocaleString()}`;
+  }
+  // Add this method to your AdminDashboardComponent class
+getRevenueLinePoints(): string {
+  const points = this.monthlyRevenue.map((value, index) => {
+    const x = index * 10; // 0, 10, 20, ... 110
+    const y = 100 - this.getBarHeight(value, this.getMaxValue(this.monthlyRevenue));
+    return `${x},${y}`;
+  }).join(' ');
+  
+  return points;
+}
 }

@@ -13,71 +13,13 @@ import { AuthService } from '../services/auth.service';
   selector: 'app-signup',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
-  template: `
-    <div class="modal-backdrop" (click)="close.emit()">
-      <div class="auth-card" (click)="$event.stopPropagation()">
-
-        <button class="close-btn" (click)="close.emit()">✕</button>
-        <h2>Create Account</h2>
-
-        <form [formGroup]="form" (ngSubmit)="createAccount()">
-
-          <input
-            type="text"
-            placeholder="Username"
-            formControlName="userName"
-          />
-
-          <input
-            type="text"
-            placeholder="First Name"
-            formControlName="name"
-          />
-
-          <input
-            type="text"
-            placeholder="Last Name"
-            formControlName="surname"
-          />
-
-          <input
-            type="email"
-            placeholder="Email"
-            formControlName="emailAddress"
-          />
-
-          <input
-            type="password"
-            placeholder="Password"
-            formControlName="password"
-          />
-
-          <button type="submit" [disabled]="loading">
-            {{ loading ? 'Creating...' : 'Create Account' }}
-          </button>
-        </form>
-
-        <small class="error" *ngIf="errorMessage">
-          {{ errorMessage }}
-        </small>
-
-        <p class="success" *ngIf="successMessage">
-          {{ successMessage }}
-        </p>
-
-        <p class="switch-text">
-          Already have an account?
-          <span class="highlight" (click)="goToLogin()">Login</span>
-        </p>
-
-      </div>
-    </div>
-  `,
+  templateUrl: './signup.component.html', 
   styleUrls: ['./signup.component.scss']
 })
 export class SignupComponent {
 
   @Output() close = new EventEmitter<void>();
+  @Output() openLogin = new EventEmitter<void>();
 
   form!: FormGroup;
   loading = false;
@@ -136,6 +78,15 @@ export class SignupComponent {
       }
     });
   }
+onClose(event: MouseEvent): void {
+  event.stopPropagation();
+  this.close.emit();
+}
+onLoginClick(event: MouseEvent): void {
+  event.stopPropagation();
+  this.openLogin.emit();
+  // this.router.navigate(['/login']);
+}
 
   goToLogin(): void {
     this.router.navigate(['/login']);

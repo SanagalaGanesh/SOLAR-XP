@@ -1,1 +1,81 @@
-<p>login works!</p>
+<div class="modal-backdrop">
+  <div class="auth-card" (click)="$event.stopPropagation()">
+    <!-- Close Button -->
+    <button class="close-btn" (click)="close.emit()">✕</button>
+
+    <!-- Logo & Title -->
+    <div class="logo-header">
+      <div class="sun-icon">☀️</div>
+      <h2>Customer Login</h2>
+    </div>
+
+    <!-- Login Form -->
+    <form [formGroup]="form" (ngSubmit)="login()">
+      <!-- Email Field -->
+      <div class="form-group">
+        <input
+          type="email"
+          placeholder="Email"
+          formControlName="email"
+          class="form-input"
+          [class.error]="form.controls['email'].touched && form.controls['email'].errors"
+        />
+        <small class="error" *ngIf="form.controls['email'].touched && form.controls['email'].errors?.['email']">
+          Please enter a valid email address
+        </small>
+        <small class="error" *ngIf="form.controls['email'].touched && form.controls['email'].errors?.['required']">
+          Email is required
+        </small>
+      </div>
+
+      <!-- Password Field with Toggle -->
+      <div class="form-group">
+        <div class="password-field">
+          <input
+            [type]="showPassword ? 'text' : 'password'"
+            placeholder="Password"
+            formControlName="password"
+            class="form-input"
+            [class.error]="form.controls['password'].touched && form.controls['password'].errors"
+          />
+          <button
+            type="button"
+            class="password-toggle"
+            (click)="togglePasswordVisibility()"
+          >
+            <svg class="eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+              <circle cx="12" cy="12" r="3"/>
+            </svg>
+          </button>
+        </div>
+        <small class="error" *ngIf="form.controls['password'].touched && form.controls['password'].errors?.['required']">
+          Password is required
+        </small>
+      </div>
+
+      <!-- Forgot Password Link -->
+      <p class="forgot-text" (click)="openForgotPassword.emit()">
+        Forgot password?
+      </p>
+
+      <!-- Submit Button -->
+      <button type="submit" class="submit-btn" [disabled]="loading">
+        {{ loading ? 'Logging in...' : 'Login' }}
+      </button>
+
+      <!-- Error Message -->
+      <small class="error-message" *ngIf="errorMessage">
+        {{ errorMessage }}
+      </small>
+    </form>
+
+    <!-- Signup Link -->
+    <p class="switch-text">
+      Don't have an account?
+      <span class="highlight" (click)="switchToSignup()">
+        Create Account
+      </span>
+    </p>
+  </div>
+</div>

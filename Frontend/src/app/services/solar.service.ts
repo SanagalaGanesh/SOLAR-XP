@@ -9,7 +9,8 @@ export class SolarService {
 
   // ✅ Backend Base URL
   private readonly BASE_URL =
-    'http://192.168.168.76:5000/api/services/app';
+    // 'http://192.168.168.76:5000/api/services/app';
+    'http://localhost:5000/api/services/app';
 
   constructor(private http: HttpClient) {}
 
@@ -41,7 +42,8 @@ submitQuote(payload: {
   selectedWatts: number[];
 }) {
   return this.http.post(
-    'http://192.168.168.76:5000/api/services/app/Solar/SubmitQuote',
+    // 'http://192.168.168.76:5000/api/services/app/Solar/SubmitQuote',
+    'http://localhost:5000/api/services/app/Solar/SubmitQuote',
     payload
   );
 }

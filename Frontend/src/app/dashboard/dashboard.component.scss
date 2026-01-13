@@ -1,9 +1,26 @@
 // dashboard.component.scss
+
+:root {
+  --color-bg-gradient: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  --color-primary: #667eea;
+  --color-primary-2: #764ba2;
+  --color-accent: #3b82f6;
+  --color-success: #43e97b;
+  --color-muted: #666666;
+  --color-surface: #ffffff;
+  --shadow-1: 0 8px 30px rgba(0, 0, 0, 0.08);
+  --shadow-2: 0 4px 20px rgba(0, 0, 0, 0.06);
+  --radius-lg: 20px;
+  --radius-md: 12px;
+  --focus-ring: 0 0 0 3px rgba(102,126,234,0.12);
+}
+
 .dashboard-container {
   min-height: 100vh;
-  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  background: var(--color-bg-gradient);
   padding: 20px;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  color: #1f2937;
 }
 
 // Header Styles
