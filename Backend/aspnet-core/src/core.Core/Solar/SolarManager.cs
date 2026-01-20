@@ -1,8 +1,10 @@
-﻿using Abp.Collections.Extensions;
+﻿using Abp.BackgroundJobs; 
+using Abp.Collections.Extensions;
 using Abp.Domain.Repositories;
 using Abp.Domain.Services;
 using Abp.Runtime.Caching;
 using Abp.UI;
+using core.Jobs; 
 using core.Solar.Dto; 
 using core.SolarEntities;
 using Microsoft.EntityFrameworkCore;
@@ -13,7 +15,6 @@ using System.Threading.Tasks;
 
 namespace core.Solar
 {
-  
     public enum QuoteStatus
     {
         Pending,
@@ -28,6 +29,7 @@ namespace core.Solar
         private readonly IRepository<SolarProduct> _productRepo;
         private readonly IRepository<ClientOrder> _orderRepo;
         private readonly ICacheManager _cacheManager;
+        private readonly IBackgroundJobManager _backgroundJobManager; 
 
         private const string Cache_Products = "SolarProductsCache";
         private const string Cache_UserQuotes = "UserQuotesCache";
@@ -39,24 +41,25 @@ namespace core.Solar
             IRepository<QuoteItem> itemRepo,
             IRepository<SolarProduct> productRepo,
             IRepository<ClientOrder> orderRepo,
-            ICacheManager cacheManager)
+            ICacheManager cacheManager,
+            IBackgroundJobManager backgroundJobManager) 
         {
             _headerRepo = headerRepo;
             _itemRepo = itemRepo;
             _productRepo = productRepo;
             _orderRepo = orderRepo;
             _cacheManager = cacheManager;
+            _backgroundJobManager = backgroundJobManager; 
         }
 
-       
+        // =========================================================
         // 1. CUSTOMER: SUBMIT QUOTE
-
+        // =========================================================
         public async Task<string> SubmitQuoteAsync(long userId, string mobile, string addressLine1, string addressLine2, List<string> selectedTypes, List<int> selectedWatts)
         {
             if (selectedTypes.IsNullOrEmpty()) throw new UserFriendlyException("Select at least one Panel Type!");
             if (selectedWatts.IsNullOrEmpty()) throw new UserFriendlyException("Select at least one Wattage!");
 
-            
             var availableProducts = await _productRepo.GetAll()
                 .Where(p => selectedTypes.Contains(p.Type) && selectedWatts.Contains(p.Watt))
                 .ToListAsync();
@@ -106,8 +109,9 @@ namespace core.Solar
             return $"Success! Quote Submitted. ID: {headerId}";
         }
 
-
-        // 2. ADMIN: GET REQUESTS 
+        // =========================================================
+        // 2. ADMIN: GET REQUESTS (Returns DTO List)
+        // =========================================================
         public List<AdminRequestDto> GetAdminRequests(string statusType)
         {
             var query = _headerRepo.GetAll()
@@ -126,7 +130,7 @@ namespace core.Solar
                 query = query.Where(h => h.QuoteItems.All(i => i.IsApproved) && h.QuoteItems.Count > 0);
             }
 
-           
+            // Mapping to DTO
             return query.Select(h => new AdminRequestDto
             {
                 HeaderId = h.Id,
@@ -145,9 +149,9 @@ namespace core.Solar
             }).ToList();
         }
 
-
-        // 3. ADMIN: APPROVE
-       
+        // =========================================================
+        // 3. ADMIN: APPROVE QUOTE
+        // =========================================================
         public async Task<string> ApproveQuoteHeaderAsync(int headerId)
         {
             var header = await _headerRepo.GetAllIncluding(h => h.QuoteItems)
@@ -167,9 +171,9 @@ namespace core.Solar
             return "Quote Request Fully Approved!";
         }
 
-
-        // 4. ADMIN: ORDERS (Returns DTO List)
-    
+        // =========================================================
+        // 4. ADMIN: GET ORDERS (Returns DTO List)
+        // =========================================================
         public List<AdminOrderDto> GetAdminOrders()
         {
             return _orderRepo.GetAll()
@@ -190,14 +194,13 @@ namespace core.Solar
                    }).ToList();
         }
 
-      
-        // 5. CUSTOMER: GET MY QUOTES 
-     
+        // =========================================================
+        // 5. CUSTOMER: GET MY QUOTES (With Caching)
+        // =========================================================
         public List<UserQuoteDto> GetMyQuotes(long userId)
         {
             string cacheKey = $"UserDashboard_{userId}";
 
-            
             return (List<UserQuoteDto>)_cacheManager
                 .GetCache(Cache_UserQuotes)
                 .Get(cacheKey, (key) =>
@@ -209,7 +212,7 @@ namespace core.Solar
                                 .OrderByDescending(h => h.CreationTime)
                                 .ToList();
 
-                    
+                    // Map to DTO
                     return query.Select(h => new UserQuoteDto
                     {
                         HeaderId = h.Id,
@@ -227,9 +230,9 @@ namespace core.Solar
                 });
         }
 
-  
-        // 6. CUSTOMER: PLACE ORDER
-
+        // =========================================================
+        // 6. CUSTOMER: PLACE ORDER (UPDATED WITH EMAIL JOB 🚀)
+        // =========================================================
         public async Task<string> PlaceOrderAsync(int itemId)
         {
             var item = await _itemRepo.GetAllIncluding(x => x.QuoteHeader)
@@ -241,27 +244,38 @@ namespace core.Solar
             if (item.Status == QuoteStatus.Ordered.ToString())
                 throw new UserFriendlyException("Already ordered!");
 
+            // 1. Save Order
             var order = new ClientOrder
             {
                 QuoteItemId = itemId,
                 OrderDate = DateTime.Now,
                 OrderStatus = "Placed"
             };
-            await _orderRepo.InsertAsync(order);
 
+            
+            int orderId = await _orderRepo.InsertAndGetIdAsync(order);
+
+            // 2. Update Status
             item.Status = QuoteStatus.Ordered.ToString();
             await _itemRepo.UpdateAsync(item);
 
+            // 3. Clear Cache
             if (item.QuoteHeader != null)
             {
                 await InvalidateUserCache(item.QuoteHeader.UserId);
             }
 
-            return "Order Placed Successfully!";
+            // 4. TRIGGER EMAIL JOB (New Feature!)
+            // Queue the email job in background
+            await _backgroundJobManager.EnqueueAsync<OrderEmailJob, int>(orderId);
+
+            return "Order Placed Successfully! Confirmation Email Sent.";
         }
 
-        // A. GET ALL PRODUCTS 
-        
+        // =========================================================
+        // 7. PRODUCT MANAGEMENT (CRUD)
+        // =========================================================
+
         public async Task<List<SolarProduct>> GetAllProducts()
         {
             var cache = _cacheManager.GetCache(Cache_Products);
@@ -276,10 +290,6 @@ namespace core.Solar
 
             return cached as List<SolarProduct>;
         }
-
-        
-        // CRUD Operations
-   
 
         public async Task<SolarProduct> GetProductByIdAsync(int id)
         {
@@ -326,9 +336,9 @@ namespace core.Solar
             await InvalidateProductsCache();
         }
 
+        // =========================================================
         // PRIVATE HELPERS
-       
-
+        // =========================================================
 
         private decimal CalculateFinalPrice(SolarProduct product)
         {
