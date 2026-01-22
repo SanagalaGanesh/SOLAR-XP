@@ -71,58 +71,7 @@ import { AuthService } from '../services/auth.service';
       </div>
     </div>
   `,
-  styles: [`
-    .modal-backdrop {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,.45);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      z-index: 1000;
-    }
-    .auth-card {
-      background: white;
-      width: 380px;
-      padding: 30px;
-      border-radius: 14px;
-      box-shadow: 0 20px 50px rgba(0,0,0,.2);
-      text-align: center;
-    }
-    input {
-      width: 100%;
-      padding: 12px;
-      border-radius: 8px;
-      border: 1px solid #d1d5db;
-      margin-bottom: 14px;
-    }
-    button {
-      width: 100%;
-      padding: 12px;
-      background: #2563eb;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-    }
-    .success-btn {
-      background: #16a34a;
-    }
-    .error {
-      color: #dc2626;
-      font-size: 14px;
-      margin-top: 8px;
-    }
-    .success {
-      color: #16a34a;
-      font-size: 14px;
-      margin-top: 8px;
-    }
-    .back-text span {
-      color: #2563eb;
-      cursor: pointer;
-    }
-  `]
+  styleUrls:['./forgot-password.component.scss']
 })
 export class ForgotPasswordComponent {
 

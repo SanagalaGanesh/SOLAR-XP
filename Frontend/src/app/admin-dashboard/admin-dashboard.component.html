@@ -1,1 +1,278 @@
-<p>admin-dashboard works!</p>
+<div class="dashboard" [class.sidebar-collapsed]="!sidebarOpen">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="profile">
+      <div class="avatar">☀️</div>
+      <h3 *ngIf="sidebarOpen">Solar Admin</h3>
+      <p *ngIf="sidebarOpen" class="role">Administrator</p>
+    </div>
+
+    <ul>
+      <li routerLink="/admin" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" data-tooltip="Dashboard">
+        <span class="icon">📊</span>
+        <span *ngIf="sidebarOpen" class="menu-text">Dashboard</span>
+      </li>
+
+      <li routerLink="/admin/customers" routerLinkActive="active" data-tooltip="Customers">
+        <span class="icon">👥</span>
+        <span *ngIf="sidebarOpen" class="menu-text">Customers</span>
+      </li>
+
+      <li routerLink="/admin/orders" routerLinkActive="active" data-tooltip="Orders">
+        <span class="icon">📦</span>
+        <span *ngIf="sidebarOpen" class="menu-text">Orders</span>
+      </li>
+
+      <li routerLink="/admin/approved" routerLinkActive="active" data-tooltip="Approved">
+        <span class="icon">✅</span>
+        <span *ngIf="sidebarOpen" class="menu-text">Approved</span>
+      </li>
+
+      <li routerLink="/admin/pending" routerLinkActive="active" data-tooltip="Pending">
+        <span class="icon">⏳</span>
+        <span *ngIf="sidebarOpen" class="menu-text">Pending</span>
+      </li>
+
+      <li routerLink="/admin/products" routerLinkActive="active" data-tooltip="Products">
+        <span class="icon">🔋</span>
+        <span *ngIf="sidebarOpen" class="menu-text">Products</span>
+      </li>
+
+      <li (click)="logout()" data-tooltip="Logout">
+        <span class="icon">🚪</span>
+        <span *ngIf="sidebarOpen" class="menu-text">Logout</span>
+      </li>
+    </ul>
+
+    <!-- Collapse Toggle -->
+    <button class="sidebar-toggle" (click)="toggleSidebar()">
+      <span class="toggle-icon">‹</span>
+    </button>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="content">
+
+    <!-- TOP BAR -->
+    <header class="topbar">
+      <button class="toggle-btn" (click)="toggleSidebar()">
+        <span class="icon">☰</span>
+      </button>
+      <div class="topbar-title">
+        <h2>Solar Energy Dashboard</h2>
+        <p class="last-updated">Live updates • Last updated: Just now</p>
+      </div>
+    </header>
+
+    <!-- DASHBOARD HOME -->
+    <ng-container *ngIf="isDashboardRoute()">
+
+      <!-- STATS CARDS -->
+      <div class="stats-cards">
+        <div class="stat-card solar-orange">
+          <div class="card-icon">☀️</div>
+          <div class="card-content">
+            <h4>Total Energy Generated</h4>
+            <p class="stat-value">{{ energyGenerated | number }} MWh</p>
+            <p class="stat-change">↑ 12% this month</p>
+          </div>
+        </div>
+
+        <div class="stat-card solar-blue">
+          <div class="card-icon">💰</div>
+          <div class="card-content">
+            <h4>Total Revenue</h4>
+            <p class="stat-value">{{ formatRevenue(revenue) }}</p>
+            <p class="stat-change">↑ 8% this month</p>
+          </div>
+        </div>
+
+        <div class="stat-card solar-green">
+          <div class="card-icon">👥</div>
+          <div class="card-content">
+            <h4>Total Customers</h4>
+            <p class="stat-value">{{ totalCustomers }}</p>
+            <p class="stat-change">↑ 5 new this week</p>
+          </div>
+        </div>
+
+        <div class="stat-card solar-purple">
+          <div class="card-icon">🌍</div>
+          <div class="card-content">
+            <h4>CO₂ Reduction</h4>
+            <p class="stat-value">{{ co2Reduction | number }} tons</p>
+            <p class="stat-change">Equivalent to {{ (co2Reduction / 20) | number }} trees</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- CHARTS SECTION -->
+      <div class="charts-section">
+        
+        <!-- Order Trends Chart -->
+       
+<!-- Order Trends Chart -->
+<div class="chart-container">
+  <div class="chart-header">
+    <h3>Monthly Orders Trend</h3>
+    <div class="chart-legend">
+      <span class="legend-item">
+        <span class="legend-color" style="background: #f59e0b"></span>
+        Orders
+      </span>
+      <span class="legend-item">
+        <span class="legend-color" style="background: #3b82f6"></span>
+        Revenue
+      </span>
+    </div>
+  </div>
+  <div class="chart-body">
+    <div class="combined-chart">
+      <div class="chart-bars">
+        <div class="chart-bar" *ngFor="let order of monthlyOrders; let i = index"
+             [style.height]="getBarHeight(order, getMaxValue(monthlyOrders)) + '%'"
+             [style.background]="getRevenueColor(monthlyRevenue[i])">
+          <div class="bar-value">{{ order }}</div>
+        </div>
+      </div>
+      <div class="chart-line">
+        <!-- <svg viewBox="0 0 100 100" class="revenue-line">
+          <polyline
+            fill="none"
+            stroke="#3b82f6"
+            stroke-width="2"
+            [attr.points]="getRevenueLinePoints()">
+          </polyline>
+        </svg> -->
+      </div>
+    </div>
+    <div class="chart-labels">
+      <span *ngFor="let month of ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']">
+        {{ month }}
+      </span>
+    </div>
+  </div>
+</div>
+
+        <!-- Panel Type Distribution -->
+        <div class="chart-container">
+          <div class="chart-header">
+            <h3>Panel Type Distribution</h3>
+          </div>
+          <div class="chart-body">
+            <div class="pie-chart">
+              <div class="pie-chart-visual">
+                <div class="pie-slice" *ngFor="let type of panelTypes; let i = index"
+                     [style.--slice-percent]="type.value"
+                     [style.--slice-color]="['#f59e0b', '#3b82f6', '#10b981'][i]"
+                     [style.--slice-index]="i">
+                </div>
+              </div>
+              <div class="pie-legend">
+                <div class="legend-item" *ngFor="let type of panelTypes; let i = index">
+                  <span class="legend-dot" [style.background]="['#f59e0b', '#3b82f6', '#10b981'][i]"></span>
+                  <span class="legend-label">{{ type.name }}</span>
+                  <span class="legend-value">{{ type.value }}%</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ENERGY PRODUCTION & ORDERS -->
+      <div class="data-section">
+        
+        <!-- Energy Production -->
+        <div class="data-container">
+          <div class="data-header">
+            <h3>Energy Production (MWh)</h3>
+            <span class="data-badge live">Live</span>
+          </div>
+          <div class="data-table">
+            <div class="table-header">
+              <span>Month</span>
+              <span>Energy Generated</span>
+              <span>Growth</span>
+            </div>
+            <div class="table-row" *ngFor="let data of energyProduction">
+              <span class="month">{{ data.month }}</span>
+              <span class="value">{{ data.value | number }}</span>
+              <span class="growth" [class.positive]="data.value > 1500">
+                {{ data.value > 1500 ? '↑' : '→' }} 
+                {{ ((data.value / 1000) * 100) | number:'1.0-0' }}%
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Order Status -->
+        <div class="data-container">
+          <div class="data-header">
+            <h3>Order Status</h3>
+          </div>
+          <div class="order-status">
+            <div class="status-item">
+              <div class="status-icon total">📦</div>
+              <div class="status-info">
+                <span class="status-label">Total Orders</span>
+                <span class="status-value">{{ totalOrders }}</span>
+              </div>
+            </div>
+            <div class="status-item">
+              <div class="status-icon approved">✅</div>
+              <div class="status-info">
+                <span class="status-label">Approved</span>
+                <span class="status-value">{{ approvedOrders }}</span>
+              </div>
+            </div>
+            <div class="status-item">
+              <div class="status-icon pending">⏳</div>
+              <div class="status-info">
+                <span class="status-label">Pending</span>
+                <span class="status-value">{{ pendingOrders }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- QUICK STATS -->
+      <div class="quick-stats">
+        <div class="quick-stat">
+          <div class="quick-icon">⚡</div>
+          <div>
+            <h4>Average Order Value</h4>
+            <p>${{ (revenue / totalOrders) || 0 | number:'1.0-0' }}</p>
+          </div>
+        </div>
+        <div class="quick-stat">
+          <div class="quick-icon">📈</div>
+          <div>
+            <h4>Customer Growth</h4>
+            <p>{{ (totalCustomers / 12) | number:'1.1-1' }} / month</p>
+          </div>
+        </div>
+        <div class="quick-stat">
+          <div class="quick-icon">🔄</div>
+          <div>
+            <h4>Conversion Rate</h4>
+            <p>{{ (approvedOrders / totalOrders * 100) || 0 | number:'1.1-1' }}%</p>
+          </div>
+        </div>
+        <div class="quick-stat">
+          <div class="quick-icon">⏱️</div>
+          <div>
+            <h4>Avg. Processing Time</h4>
+            <p>2.3 days</p>
+          </div>
+        </div>
+      </div>
+
+    </ng-container>
+
+    <router-outlet></router-outlet>
+  </main>
+</div>

@@ -1,14 +1,378 @@
-<div class="landing-container">
-  <h1>Welcome to Our Platform</h1>
-  <p>Get started by logging in or creating an account</p>
+<!-- landing.component.html -->
+<div class="landing">
+  <!-- NAVBAR -->
+  <nav class="landing-navbar">
+    <div class="logo">☀️ <strong>Esolar</strong></div>
 
-  <div class="button-group">
-    <button routerLink="/login" class="btn btn-login">
-      Login
+    <div class="menu">
+      <!-- LOGGED OUT -->
+      <ng-container *ngIf="!isLoggedIn">
+        <button class="login-btn" (click)="openLogin()">Login</button>
+        <button class="signup-btn" (click)="openSignup()">Sign Up</button>
+      </ng-container>
+
+      <!-- LOGGED IN -->
+      <ng-container *ngIf="isLoggedIn">
+        <button class="login-btn" (click)="goDashboard()">Dashboard</button>
+        <button class="signup-btn" (click)="logout()">Logout</button>
+      </ng-container>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+<section class="hero">
+  <div
+    class="hero-slide"
+    *ngFor="let image of heroImages; let i = index"
+    [class.active]="i === currentSlide"
+    [style.backgroundImage]="'url(' + image + ')'"
+  ></div>
+
+  <div class="hero-overlay"></div>
+
+<div class="hero-content">
+  <!-- Solar Badge -->
+  <span class="hero-badge">☀️ Clean Energy for a Sustainable Tomorrow</span>
+
+  <h1>Power Your Future With Solar Energy</h1>
+
+  <p class="hero-subtitle">
+    Switch to smart, renewable solar solutions and reduce your electricity
+    bills while protecting the planet.
+  </p>
+
+  <!-- Solar Highlights -->
+  <div class="hero-features">
+    <div class="feature-item">⚡ High Efficiency</div>
+    <div class="feature-item">🌍 Eco Friendly</div>
+    <div class="feature-item">💰 Cost Saving</div>
+  </div>
+
+  <!-- CTA Buttons -->
+  <div class="hero-actions">
+    <button
+      class="hero-btn"
+      *ngIf="!isLoggedIn"
+      (click)="openSignup()">
+      Get Started
     </button>
 
-    <button routerLink="/signup" class="btn btn-signup">
-      Sign Up
+    <button
+      class="hero-btn outline"
+      (click)="openSolarAssistant()">
+      Talk to Expert
     </button>
   </div>
+</div>
+
+</section>
+
+
+  <!-- SOLAR MODELS -->
+<!-- Replace your existing solar-section with this -->
+<section class="solar-section">
+  <div class="section-header">
+    <h2 class="section-title">Our Solar Panel Models</h2>
+    <p class="section-subtitle">Choose from our premium range of high-performance solar solutions</p>
+    
+    <!-- Search Bar -->
+    <div class="search-container">
+      <div class="search-bar">
+        <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+        </svg>
+        <input 
+          type="text" 
+          placeholder="Search solar panels..." 
+          class="search-input"
+          #searchInput
+          (input)="filterModels(searchInput.value)"
+        >
+      </div>
+    </div>
+  </div>
+
+  <!-- Solar Models Grid -->
+  <div class="solar-grid">
+    <!-- Monocrystalline Panel Card -->
+    <div class="model-card" data-type="monocrystalline">
+      <div class="model-card-header">
+        <div class="model-badge premium">Premium</div>
+        <div class="model-efficiency">🏆 22% Efficiency</div>
+      </div>
+      
+      <div class="model-image">
+        <img 
+          src="https://images.unsplash.com/photo-1509391366360-2e959784a276?auto=format&fit=crop&w=600" 
+          alt="Monocrystalline Solar Panels"
+          loading="lazy"
+        >
+        <div class="image-overlay">
+          <span class="zoom-icon">🔍</span>
+        </div>
+      </div>
+
+      <div class="model-content">
+        <div class="model-info">
+          <h3 class="model-title">Monocrystalline Panels</h3>
+          <p class="model-description">
+            High-efficiency panels with sleek black design, perfect for residential rooftops 
+            with limited space.
+          </p>
+        </div>
+
+        <div class="model-specs">
+          <div class="spec-item">
+            <span class="spec-icon">⚡</span>
+            <span class="spec-text">320-400W</span>
+          </div>
+          <div class="spec-item">
+            <span class="spec-icon">📏</span>
+            <span class="spec-text">Compact Size</span>
+          </div>
+          <div class="spec-item">
+            <span class="spec-icon">📅</span>
+            <span class="spec-text">25 Year Warranty</span>
+          </div>
+        </div>
+
+        <div class="model-pricing">
+          <div class="price-info">
+            <span class="price-label">Starting from</span>
+            <div class="price-amount">$299<span class="price-unit">/panel</span></div>
+          </div>
+          <button class="view-details-btn" (click)="goToModel('mono')">
+            <span>View Details</span>
+            <svg class="btn-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M9 5l7 7-7 7"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Polycrystalline Panel Card -->
+    <div class="model-card" data-type="polycrystalline">
+      <div class="model-card-header">
+        <div class="model-badge value">Best Value</div>
+        <div class="model-efficiency">💰 18% Efficiency</div>
+      </div>
+      
+      <div class="model-image">
+        <img 
+          src="https://images.unsplash.com/photo-1508514177221-188b1cf16e9d?auto=format&fit=crop&w=600" 
+          alt="Polycrystalline Solar Panels"
+          loading="lazy"
+        >
+        <div class="image-overlay">
+          <span class="zoom-icon">🔍</span>
+        </div>
+      </div>
+
+      <div class="model-content">
+        <div class="model-info">
+          <h3 class="model-title">Polycrystalline Panels</h3>
+          <p class="model-description">
+            Cost-effective blue panels ideal for large-scale commercial installations 
+            and spacious residential properties.
+          </p>
+        </div>
+
+        <div class="model-specs">
+          <div class="spec-item">
+            <span class="spec-icon">⚡</span>
+            <span class="spec-text">280-350W</span>
+          </div>
+          <div class="spec-item">
+            <span class="spec-icon">🏢</span>
+            <span class="spec-text">Commercial Grade</span>
+          </div>
+          <div class="spec-item">
+            <span class="spec-icon">📅</span>
+            <span class="spec-text">20 Year Warranty</span>
+          </div>
+        </div>
+
+        <div class="model-pricing">
+          <div class="price-info">
+            <span class="price-label">Starting from</span>
+            <div class="price-amount">$199<span class="price-unit">/panel</span></div>
+          </div>
+          <button class="view-details-btn" (click)="goToModel('poly')">
+            <span>View Details</span>
+            <svg class="btn-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M9 5l7 7-7 7"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Thin Film Panel Card -->
+    <div class="model-card" data-type="thin-film">
+      <div class="model-card-header">
+        <div class="model-badge flexible">Flexible</div>
+        <div class="model-efficiency">🌀 15% Efficiency</div>
+      </div>
+      
+      <div class="model-image">
+        <img 
+          src="https://images.unsplash.com/photo-1613665813446-82a78c468a1d?auto=format&fit=crop&w-600" 
+          alt="Thin Film Solar Panels"
+          loading="lazy"
+        >
+        <div class="image-overlay">
+          <span class="zoom-icon">🔍</span>
+        </div>
+      </div>
+
+      <div class="model-content">
+        <div class="model-info">
+          <h3 class="model-title">Thin Film Panels</h3>
+          <p class="model-description">
+            Ultra-thin, flexible panels for curved surfaces, vehicles, and portable 
+            solar applications.
+          </p>
+        </div>
+
+        <div class="model-specs">
+          <div class="spec-item">
+            <span class="spec-icon">⚡</span>
+            <span class="spec-text">100-200W</span>
+          </div>
+          <div class="spec-item">
+            <span class="spec-icon">🎯</span>
+            <span class="spec-text">Versatile Use</span>
+          </div>
+          <div class="spec-item">
+            <span class="spec-icon">📅</span>
+            <span class="spec-text">15 Year Warranty</span>
+          </div>
+        </div>
+
+        <div class="model-pricing">
+          <div class="price-info">
+            <span class="price-label">Starting from</span>
+            <div class="price-amount">$149<span class="price-unit">/panel</span></div>
+          </div>
+          <button class="view-details-btn" (click)="goToModel('thin')">
+            <span>View Details</span>
+            <svg class="btn-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M9 5l7 7-7 7"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Comparison Table -->
+  <div class="comparison-section">
+    <h3 class="comparison-title">Detailed Comparison</h3>
+    <div class="comparison-table">
+      <table>
+        <thead>
+          <tr>
+            <th>Feature</th>
+            <th>Monocrystalline</th>
+            <th>Polycrystalline</th>
+            <th>Thin Film</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Efficiency</td>
+            <td>High (20-22%)</td>
+            <td>Medium (15-18%)</td>
+            <td>Low (10-15%)</td>
+          </tr>
+          <tr>
+            <td>Cost per Watt</td>
+            <td>$$$</td>
+            <td>$$</td>
+            <td>$</td>
+          </tr>
+          <tr>
+            <td>Space Required</td>
+            <td>Less</td>
+            <td>More</td>
+            <td>Most</td>
+          </tr>
+          <tr>
+            <td>Lifespan</td>
+            <td>25+ years</td>
+            <td>20+ years</td>
+            <td>15+ years</td>
+          </tr>
+          <tr>
+            <td>Best For</td>
+            <td>Residential</td>
+            <td>Commercial</td>
+            <td>Portable/Custom</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+  <!-- SOLAR CHATBOT SECTION -->
+  <section class="chatbot-section">
+    <div class="chatbot-container">
+      <div class="chatbot-content">
+        <h2 class="chatbot-title">
+          Have Questions About Solar Panels?
+        </h2>
+
+        <p class="chatbot-subtitle">
+          Not sure which solar model is right for your home or business?
+          Ask our solar assistant and get instant, expert guidance.
+        </p>
+
+        <ul class="chatbot-features">
+          <li>✔ Compare Mono, Poly & Thin Film panels</li>
+          <li>✔ Get recommendations based on your needs</li>
+          <li>✔ Understand pricing, efficiency & subsidies</li>
+        </ul>
+
+        <button class="chatbot-btn" (click)="openSolarAssistant()">
+          💬 Ask the Solar Assistant
+        </button>
+      </div>
+
+      <div class="chatbot-visual">
+        <div class="chatbot-card">
+          <p class="bot-question">
+            "Which solar panel is best for my rooftop?"
+          </p>
+          <p class="bot-answer">
+            Based on your usage and space, Monocrystalline panels offer the
+            highest efficiency for residential rooftops.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+<!-- LOGIN MODAL -->
+<app-login
+  *ngIf="showLogin"
+  (close)="closeAll()"
+  (openSignup)="openSignup()"     
+  (openForgotPassword)="openForgotPassword()">
+</app-login>
+
+<!-- SIGNUP MODAL -->
+<app-signup
+  *ngIf="showSignup"
+  (close)="closeAll()"
+  (openLogin)="openLogin()">      
+</app-signup>
+
+  <!-- FORGOT PASSWORD MODAL -->
+  <app-forgot-password
+    *ngIf="showForgotPassword"
+    (close)="closeAll()"
+    (backToLogin)="openLogin()">
+  </app-forgot-password>
 </div>

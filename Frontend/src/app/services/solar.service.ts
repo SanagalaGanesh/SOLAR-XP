@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 @Injectable({
@@ -9,7 +9,8 @@ export class SolarService {
 
   // ✅ Backend Base URL
   private readonly BASE_URL =
-    'http://192.168.168.76:5000/api/services/app/Solar';
+    // 'http://192.168.168.76:5000/api/services/app';
+    'http://localhost:5000/api/services/app';
 
   constructor(private http: HttpClient) {}
 
@@ -23,7 +24,7 @@ export class SolarService {
     const params = new HttpParams().set('userId', userId.toString());
 
     return this.http.get<any>(
-      `${this.BASE_URL}/GetMyQuotes`,
+      `${this.BASE_URL}/Solar/GetMyQuotes`,
       { params }
     );
   }
@@ -31,26 +32,57 @@ export class SolarService {
   /**
    * 🔹 Submit a new solar quote
    */
-  submitQuote(payload: {
-    mobile: string;
-    addressLine1: string;
-    addressLine2?: string;
-    selectedTypes: string[];
-    selectedWatts: number[];
-  }): Observable<any> {
-    return this.http.post<any>(
-      `${this.BASE_URL}/SubmitQuote`,
-      payload
-    );
-  }
+
+submitQuote(payload: {
+  userId: number;
+  mobile: string;
+  addressLine1: string; 
+  addressLine2: string;
+  selectedTypes: string[];
+  selectedWatts: number[];
+}) {
+  return this.http.post(
+    // 'http://192.168.168.76:5000/api/services/app/Solar/SubmitQuote',
+    'http://localhost:5000/api/services/app/Solar/SubmitQuote',
+    payload
+  );
+}
+
 
   /**
    * 🔹 Place order for an approved quote item
    */
   placeOrder(payload: { itemId: number }): Observable<any> {
     return this.http.post<any>(
-      `${this.BASE_URL}/PlaceOrder`,
+      `${this.BASE_URL}/Solar/PlaceOrder`,
       payload
+    );
+  }
+
+  /**
+   * 🔹 Chat with Solar Bot Assistant
+   * Used for interactive chatbot conversations about solar panels
+   */
+  chatWithSolarBot(payload: {
+    currentStep: string;
+    userResponse: string;
+    savedPurpose: string;
+    savedBill: string;
+    savedCuts: string;
+  }): Observable<any> {
+    // Set headers for text/plain response type
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      'Accept': 'text/plain'
+    });
+
+    return this.http.post(
+      `${this.BASE_URL}/SolarChat/Interact`,
+      payload,
+      { 
+        headers,
+        responseType: 'text' 
+      }
     );
   }
 }

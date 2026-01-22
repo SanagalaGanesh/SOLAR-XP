@@ -65,13 +65,13 @@ export const routes: Routes = [
     children: [
 
       /* DEFAULT ADMIN HOME */
-      {
-        path: '',
-        pathMatch: 'full',
-        loadComponent: () =>
-          import('./admin-dashboard/admin-dashboard.component')
-            .then(m => m.AdminDashboardComponent)
-      },
+      // {
+      //   path: '',
+      //   pathMatch: 'full',
+      //   loadComponent: () =>
+      //     import('./admin-dashboard/admin-dashboard.component')
+      //       .then(m => m.AdminDashboardComponent)
+      // },
 
       {
         path: 'customers',

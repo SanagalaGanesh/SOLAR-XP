@@ -7,8 +7,13 @@ import { Observable } from 'rxjs';
 })
 export class AdminService {
 
+  // ❌ Old server (commented)
+  // private readonly API_URL =
+  //   'http://192.168.168.76:5000/api/services/app/Solar';
+
+  // ✅ Localhost server
   private readonly API_URL =
-    'http://192.168.168.76:5000/api/services/app/Solar';
+    'http://localhost:5000/api/services/app/Solar';
 
   constructor(private http: HttpClient) {}
 
@@ -17,15 +22,14 @@ export class AdminService {
   // =========================
   getCustomers(): Observable<any> {
     return this.http.get(
-      'http://192.168.168.76:5000/api/services/app/User/GetAll'
+      // 'http://192.168.168.76:5000/api/services/app/User/GetAll'
+      'http://localhost:5000/api/services/app/User/GetAll'
     );
   }
 
   // =========================
   // 📦 ORDERS
   // =========================
-
-  //test
   getAdminOrders(): Observable<any> {
     return this.http.get(`${this.API_URL}/GetAdminOrders`);
   }
@@ -48,23 +52,23 @@ export class AdminService {
       { id: headerId }
     );
   }
-getApprovedQuotes(): Observable<any> {
+
+  getApprovedQuotes(): Observable<any> {
     return this.http.get(
       `${this.API_URL}/GetAdminRequests?status=Approved`
     );
   }
+
   // ======================================================
-  // 🧩 PRODUCTS (CRUD)  ✅ THIS FIXES YOUR ERROR
+  // 🧩 PRODUCTS (CRUD)
   // ======================================================
 
-  // 🔹 GET ALL PRODUCTS
   getAllProducts(): Observable<any> {
     return this.http.get(
       `${this.API_URL}/GetAllProducts`
     );
   }
 
-  // 🔹 CREATE PRODUCT
   createProduct(payload: {
     type: string;
     watt: number;
@@ -77,7 +81,6 @@ getApprovedQuotes(): Observable<any> {
     );
   }
 
-  // 🔹 UPDATE PRODUCT
   updateProduct(payload: {
     id: number;
     type: string;
@@ -91,7 +94,6 @@ getApprovedQuotes(): Observable<any> {
     );
   }
 
-  // 🔹 DELETE PRODUCT
   deleteProduct(id: number): Observable<any> {
     return this.http.delete(
       `${this.API_URL}/DeleteProduct?id=${id}`
