@@ -1,0 +1,158 @@
+<div class="page">
+  <div class="page-header">
+    <h2>Customers</h2>
+    <div class="subtitle">Manage and view all customer information</div>
+  </div>
+
+  <div class="header-actions">
+    <div class="customer-count">
+      Total Customers: <span>{{ filteredCustomers.length }}</span>
+    </div>
+    
+    <div class="search-wrapper">
+      <input
+        type="text"
+        placeholder="Search customers by name, email..."
+        [(ngModel)]="searchText"
+        (input)="applySearch()" />
+      
+      <button
+        *ngIf="searchText"
+        class="clear-btn"
+        type="button"
+        (click)="clearSearch()">
+        ×
+      </button>
+    </div>
+  </div>
+
+
+    <div class="table-card">
+
+      <table>
+        <thead>
+          <tr>
+            <th class="center">S.NO</th>
+            <th>Customer Name</th>
+            <th>Email</th>
+            <th>Username</th>
+            <th class="center">Status</th>
+            <th class="center">Actions</th>
+          </tr>
+        </thead>
+
+        <tbody>
+<tr *ngFor="let c of filteredCustomers; let i = index">
+            <td class="center">{{ i + 1 }}</td>
+
+            <td class="name">
+              {{ c.name }} {{ c.surname }}
+            </td>
+
+            <td>{{ c.emailAddress }}</td>
+
+            <td>{{ c.userName }}</td>
+
+            <td class="center">
+              <span
+                class="status"
+                [class.active]="c.isActive"
+                [class.inactive]="!c.isActive">
+                {{ c.isActive ? 'Active' : 'Inactive' }}
+              </span>
+            </td>
+
+            <td class="center actions">
+              <button class="view-btn" (click)="openCustomerDetails(c)">
+                <svg class="view-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                </svg>
+                <span>View</span>
+              </button>
+            </td>
+          </tr>
+
+<tr *ngIf="filteredCustomers.length === 0">
+            <td colspan="6" class="empty">
+              No customers found
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+    </div>
+
+    <!-- Customer Details Modal -->
+    <div class="modal-overlay" *ngIf="showModal" (click)="closeModal()">
+      <div class="modal-content" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h3>Customer Details</h3>
+          <button class="close-btn" (click)="closeModal()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                    d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+          </button>
+        </div>
+
+        <div class="modal-body" *ngIf="selectedCustomer">
+          <div class="detail-grid">
+            <div class="detail-item">
+              <label>Full Name</label>
+              <p>{{ selectedCustomer.name }} {{ selectedCustomer.surname }}</p>
+            </div>
+            
+            <div class="detail-item">
+              <label>Email</label>
+              <p>{{ selectedCustomer.emailAddress }}</p>
+            </div>
+            
+            <div class="detail-item">
+              <label>Username</label>
+              <p>{{ selectedCustomer.userName }}</p>
+            </div>
+            
+            <div class="detail-item">
+              <label>Status</label>
+              <p>
+                <span class="status" 
+                      [class.active]="selectedCustomer.isActive"
+                      [class.inactive]="!selectedCustomer.isActive">
+                  {{ selectedCustomer.isActive ? 'Active' : 'Inactive' }}
+                </span>
+              </p>
+            </div>
+            
+            <div class="detail-item" *ngIf="selectedCustomer.phoneNumber">
+              <label>Phone Number</label>
+              <p>{{ selectedCustomer.phoneNumber }}</p>
+            </div>
+            
+            <div class="detail-item" *ngIf="selectedCustomer.creationTime">
+              <label>Joined Date</label>
+              <p>{{ formatDate(selectedCustomer.creationTime) }}</p>
+            </div>
+            
+            <div class="detail-item" *ngIf="selectedCustomer.address">
+              <label>Address</label>
+              <p>{{ selectedCustomer.address }}</p>
+            </div>
+            
+            <div class="detail-item full-width" *ngIf="selectedCustomer.notes">
+              <label>Additional Notes</label>
+              <p class="notes">{{ selectedCustomer.notes }}</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button class="btn-secondary" (click)="closeModal()">Close</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+ 

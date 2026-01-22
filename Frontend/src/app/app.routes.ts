@@ -11,7 +11,7 @@ export const routes: Routes = [
   {
     path: 'landing',
     loadComponent: () =>
-      import('./landing-component/landing-component.component')
+      import('./customer/landing-component/landing-component.component')
         .then(m => m.LandingComponent)
   },
 
@@ -19,13 +19,13 @@ export const routes: Routes = [
   {
     path: 'login',
     loadComponent: () =>
-      import('./login/login.component')
+      import('./customer/login/login.component')
         .then(m => m.LoginComponent)
   },
   {
     path: 'signup',
     loadComponent: () =>
-      import('./signup/signup.component')
+      import('./customer/signup/signup.component')
         .then(m => m.SignupComponent)
   },
 
@@ -33,7 +33,7 @@ export const routes: Routes = [
   {
     path: 'solar/:type',
     loadComponent: () =>
-      import('./solar-model/solar-model.component')
+      import('./customer/solar-model/solar-model.component')
         .then(m => m.SolarModelComponent)
   },
 
@@ -42,7 +42,7 @@ export const routes: Routes = [
     path: 'dashboard',
     canActivate: [AuthGuard],
     loadComponent: () =>
-      import('./dashboard/dashboard.component')
+      import('./customer/dashboard/dashboard.component')
         .then(m => m.DashboardComponent)
   },
 
@@ -50,7 +50,7 @@ export const routes: Routes = [
   {
     path: 'admin-login',
     loadComponent: () =>
-      import('./admin-login/admin-login.component')
+      import('./admin/admin-login/admin-login.component')
         .then(m => m.AdminLoginComponent)
   },
 
@@ -59,54 +59,46 @@ export const routes: Routes = [
     path: 'admin',
     canActivate: [AdminGuard],
     loadComponent: () =>
-      import('./admin-dashboard/admin-dashboard.component')
+      import('./admin/admin-dashboard/admin-dashboard.component')
         .then(m => m.AdminDashboardComponent),
 
     children: [
-
-      /* DEFAULT ADMIN HOME */
-      // {
-      //   path: '',
-      //   pathMatch: 'full',
-      //   loadComponent: () =>
-      //     import('./admin-dashboard/admin-dashboard.component')
-      //       .then(m => m.AdminDashboardComponent)
-      // },
-
+      /* ✅ CUSTOMERS */
       {
         path: 'customers',
-        loadComponent: () =>
-          import('./admin-dashboard/admin-customers/admin-customers.component')
-            .then(m => m.AdminCustomersComponent)
+        loadChildren: () =>
+          import('./admin/admin-dashboard/admin-customers/admin-customers.routes')
+            .then(m => m.CUSTOMERS_ROUTES)
       },
-
+// ✅ ORDERS
       {
         path: 'orders',
-        loadComponent: () =>
-          import('./admin-dashboard/admin-orders/admin-orders.component')
-            .then(m => m.AdminOrdersComponent)
+        loadChildren: () =>
+          import('./admin/admin-dashboard/admin-orders/admin-orders.routes')
+            .then(m => m.ORDERS_ROUTES)
       },
-
+// ✅ APPROVED
       {
         path: 'approved',
-        loadComponent: () =>
-          import('./admin-dashboard/admin-approved/admin-approved.component')
-            .then(m => m.AdminApprovedComponent)
+        loadChildren: () =>
+          import('./admin/admin-dashboard/admin-approved/admin-approved.routes')
+            .then(m => m.APPROVED_ROUTES)
       },
 
-      {
-        path: 'pending',
-        loadComponent: () =>
-          import('./admin-dashboard/admin-pending/admin-pending.component')
-            .then(m => m.AdminPendingComponent)
-      },
+/* PENDING */
+{
+  path: 'pending',
+  loadChildren: () =>
+    import('./admin/admin-dashboard/admin-pending/admin-pending.routes')
+      .then(m => m.PENDING_ROUTES)
+},
 
       /* ✅ PRODUCTS (THIS FIXES THE REDIRECT ISSUE) */
       {
         path: 'products',
-        loadComponent: () =>
-          import('./admin-dashboard/admin-products/admin-products.component')
-            .then(m => m.AdminProductsComponent)
+        loadChildren: () =>
+          import('./admin/admin-dashboard/admin-products/admin-products.routes')
+            .then(m => m.PRODUCTS_ROUTES)
       }
     ]
   },

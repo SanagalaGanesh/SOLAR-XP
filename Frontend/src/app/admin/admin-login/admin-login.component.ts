@@ -1,0 +1,96 @@
+import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
+import { AuthService } from '../../services/auth.service';
+
+@Component({
+  selector: 'app-admin-login',
+  standalone: true,
+  imports: [CommonModule, FormsModule],
+  template: `
+  <div class="login-container">
+    <div class="login-card">
+
+      <h2 class="login-h2">Admin Login</h2>
+
+      <div class="form-group">
+        <label>Email / Username</label>
+        <input
+          type="text"
+          [(ngModel)]="username"
+          placeholder="admin@example.com">
+      </div>
+
+      <div class="form-group">
+        <label>Password</label>
+        <input
+          type="password"
+          [(ngModel)]="password"
+          placeholder="••••••••">
+      </div>
+
+      <button (click)="login()" [disabled]="loading">
+        {{ loading ? 'Logging in...' : 'Login' }}
+      </button>
+
+      <p class="error" *ngIf="errorMessage">
+        {{ errorMessage }}
+      </p>
+
+    </div>
+  </div>
+  `,
+  styleUrls: ['./admin-login.component.scss']
+})
+export class AdminLoginComponent {
+
+  username = '';
+  password = '';
+  loading = false;
+  errorMessage = '';
+
+  constructor(
+    private authService: AuthService,
+    private router: Router
+  ) {}
+
+  login(): void {
+    if (!this.username || !this.password) {
+      this.errorMessage = 'All fields are required';
+      return;
+    }
+
+    this.loading = true;
+    this.errorMessage = '';
+
+    this.authService.login({
+      userNameOrEmailAddress: this.username,
+      password: this.password,
+      rememberClient: true
+    }).subscribe({
+      next: (res: any) => {
+        this.loading = false;
+
+        if (res?.result?.accessToken) {
+
+          // ✅ STORE ADMIN SESSION (SEPARATE)
+          localStorage.setItem('ADMIN_TOKEN', res.result.accessToken);
+          localStorage.setItem('ADMIN_ID', String(res.result.userId));
+          localStorage.setItem('ROLE', 'ADMIN');
+
+          // 🚀 Redirect to Admin Dashboard
+          this.router.navigateByUrl('/admin', { replaceUrl: true });
+
+        } else {
+          this.errorMessage = 'Invalid credentials';
+        }
+      },
+      error: (err) => {
+        this.loading = false;
+        this.errorMessage =
+          err?.error?.error?.message || 'Admin login failed';
+      }
+    });
+  }
+}

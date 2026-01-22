@@ -1,0 +1,187 @@
+<div class="page">
+
+  <div class="section-header">
+    <h2>Total Orders ({{ orders.length }})</h2>
+  </div>
+
+  <div class="table-card">
+
+    <table>
+      <thead>
+        <tr>
+          <th class="center" style="width: 60px;">S.No</th>
+          <th style="width: 200px;">CUSTOMER</th>
+          <th style="width: 150px;">ADDRESS</th>
+          <th style="width: 180px;">MODEL</th>
+          <th class="right" style="width: 120px;">AMOUNT</th>
+          <th class="center" style="width: 100px;">STATUS</th>
+          <th class="center" style="width: 100px;">ACTIONS</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr *ngFor="let o of orders; let i = index">
+          <!-- S.NO -->
+          <td class="center">{{ i + 1 }}</td>
+
+          <td class="customer-cell">
+            <div class="customer-name">{{ o.customerName }}</div>
+            <div class="customer-phone">{{ formatPhone(o.mobile) }}</div>
+          </td>
+
+          <td class="address-cell">{{ o.address || 'N/A' }}</td>
+
+          <td class="model-cell">{{ o.modelName }}</td>
+
+          <td class="amount right">₹{{ formatAmount(o.amount) }}</td>
+
+          <td class="center">
+            <span class="status" [ngClass]="getStatusClass(o.status)">
+              {{ getStatusText(o.status) }}
+            </span>
+          </td>
+
+          <td class="center actions">
+            <button class="view-btn" (click)="openOrderDetails(o)" title="View Order Details">
+              <svg class="view-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                      d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                      d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+              </svg>
+              <span class="btn-text">View</span>
+            </button>
+          </td>
+        </tr>
+
+        <tr *ngIf="orders.length === 0">
+          <td colspan="7" class="empty">
+            No orders found
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+  </div>
+
+  <!-- Order Details Modal -->
+  <div class="modal-overlay" *ngIf="showModal" (click)="closeModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Order Details</h3>
+        <div class="order-id">Order #{{ selectedOrder?.orderId || 'N/A' }}</div>
+        <button class="close-btn" (click)="closeModal()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                  d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="modal-body" *ngIf="selectedOrder">
+        <div class="detail-sections">
+          
+          <!-- Customer Section -->
+          <div class="section">
+            <h4>Customer Information</h4>
+            <div class="detail-grid">
+              <div class="detail-item">
+                <label>NAME</label>
+                <p>{{ selectedOrder.customerName }}</p>
+              </div>
+              <div class="detail-item">
+                <label>PHONE</label>
+                <p>{{ formatPhone(selectedOrder.mobile) }}</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Order Section -->
+          <div class="section">
+            <h4>Order Information</h4>
+            <div class="detail-grid">
+              <div class="detail-item">
+                <label>MODEL</label>
+                <p>{{ selectedOrder.modelName }}</p>
+              </div>
+              <div class="detail-item">
+                <label>AMOUNT</label>
+                <p class="amount-large">₹{{ formatAmount(selectedOrder.amount) }}</p>
+              </div>
+              <div class="detail-item">
+                <label>STATUS</label>
+                <div style="position: relative;">
+                  <div class="current-status-display">
+                    <span class="status-display" [ngClass]="getStatusClass(selectedOrder.status)">
+                      {{ getStatusIcon(selectedOrder.status) }} {{ getStatusText(selectedOrder.status) }}
+                    </span>
+                    
+                    <!-- Update Status Button - Only show if not Delivered or Cancelled -->
+                    <button class="update-status-btn" 
+                            *ngIf="selectedOrder.status !== 'Delivered' && selectedOrder.status !== 'Cancelled'"
+                            (click)="toggleStatusDropdown()">
+                      Update Status
+                    </button>
+                  </div>
+                  
+                  <!-- Status Dropdown -->
+                  <div class="status-dropdown" *ngIf="showStatusDropdown">
+                    <div class="dropdown-title">Update to:</div>
+                    <div *ngFor="let status of getNextStatusOptions(selectedOrder.status)" 
+                         class="status-option"
+                         (click)="updateOrderStatus(status.value)">
+                      <span class="status-option-icon">{{ status.icon }}</span>
+                      <span class="status-option-text">{{ status.label }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="detail-item" *ngIf="selectedOrder.orderDate">
+                <label>ORDER DATE</label>
+                <p>{{ formatDate(selectedOrder.orderDate) }}</p>
+              </div>
+              <div class="detail-item" *ngIf="selectedOrder.deliveryDate">
+                <label>DELIVERY DATE</label>
+                <p>{{ formatDate(selectedOrder.deliveryDate) }}</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Address Section -->
+          <div class="section">
+            <h4>Delivery Address</h4>
+            <div class="address-card">
+              <p>{{ selectedOrder.address }}</p>
+              <div class="address-details" *ngIf="selectedOrder.pincode || selectedOrder.city">
+                <span *ngIf="selectedOrder.city">{{ selectedOrder.city }}</span>
+                <span *ngIf="selectedOrder.state">, {{ selectedOrder.state }}</span>
+                <span *ngIf="selectedOrder.pincode"> - {{ selectedOrder.pincode }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Additional Details -->
+          <div class="section" *ngIf="selectedOrder.paymentMethod || selectedOrder.notes">
+            <h4>Additional Information</h4>
+            <div class="detail-grid">
+              <div class="detail-item" *ngIf="selectedOrder.paymentMethod">
+                <label>PAYMENT METHOD</label>
+                <p>{{ selectedOrder.paymentMethod }}</p>
+              </div>
+              <div class="detail-item" *ngIf="selectedOrder.notes">
+                <label>NOTES</label>
+                <p class="notes">{{ selectedOrder.notes }}</p>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-secondary" (click)="closeModal()">Close</button>
+      </div>
+    </div>
+  </div>
+
+</div>
