@@ -18,9 +18,9 @@ namespace core.Solar
             _solarManager = solarManager;
         }
 
-        // =========================================================
+      
         // CUSTOMER ACTIONS
-        // =========================================================
+     
 
         public async Task<MessageDto> SubmitQuote(SubmitQuoteInput input)
         {
@@ -51,9 +51,8 @@ namespace core.Solar
             return ObjectMapper.Map<List<SolarProductDto>>(products);
         }
 
-        // =========================================================
         // ADMIN ACTIONS
-        // =========================================================
+      
 
         [Authorize(Roles = "Admin")]
         public List<AdminRequestDto> GetAdminRequests(string status)
@@ -74,9 +73,9 @@ namespace core.Solar
             return new MessageDto { Message = result };
         }
 
-        // =========================================================
+        
         // PRODUCT CRUD (ADMIN)
-        // =========================================================
+
 
         [Authorize(Roles = "Admin")]
         public async Task<SolarProductDto> GetProduct(EntityDto input)

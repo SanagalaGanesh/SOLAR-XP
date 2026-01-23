@@ -52,9 +52,9 @@ namespace core.Solar
             _backgroundJobManager = backgroundJobManager; 
         }
 
-        // =========================================================
+       
         // 1. CUSTOMER: SUBMIT QUOTE
-        // =========================================================
+   
         public async Task<string> SubmitQuoteAsync(long userId, string mobile, string addressLine1, string addressLine2, List<string> selectedTypes, List<int> selectedWatts)
         {
             if (selectedTypes.IsNullOrEmpty()) throw new UserFriendlyException("Select at least one Panel Type!");
@@ -109,9 +109,9 @@ namespace core.Solar
             return $"Success! Quote Submitted. ID: {headerId}";
         }
 
-        // =========================================================
+      
         // 2. ADMIN: GET REQUESTS (Returns DTO List)
-        // =========================================================
+     
         public List<AdminRequestDto> GetAdminRequests(string statusType)
         {
             var query = _headerRepo.GetAll()
@@ -149,9 +149,9 @@ namespace core.Solar
             }).ToList();
         }
 
-        // =========================================================
+    
         // 3. ADMIN: APPROVE QUOTE
-        // =========================================================
+       
         public async Task<string> ApproveQuoteHeaderAsync(int headerId)
         {
             var header = await _headerRepo.GetAllIncluding(h => h.QuoteItems)
@@ -171,9 +171,8 @@ namespace core.Solar
             return "Quote Request Fully Approved!";
         }
 
-        // =========================================================
-        // 4. ADMIN: GET ORDERS (Returns DTO List)
-        // =========================================================
+        // 4. ADMIN: GET ORDERS 
+   
         public List<AdminOrderDto> GetAdminOrders()
         {
             return _orderRepo.GetAll()
@@ -194,9 +193,9 @@ namespace core.Solar
                    }).ToList();
         }
 
-        // =========================================================
-        // 5. CUSTOMER: GET MY QUOTES (With Caching)
-        // =========================================================
+      
+        // 5. CUSTOMER: GET MY QUOTES 
+        
         public List<UserQuoteDto> GetMyQuotes(long userId)
         {
             string cacheKey = $"UserDashboard_{userId}";
@@ -230,9 +229,9 @@ namespace core.Solar
                 });
         }
 
-        // =========================================================
-        // 6. CUSTOMER: PLACE ORDER (UPDATED WITH EMAIL JOB 🚀)
-        // =========================================================
+     
+        // 6. CUSTOMER: PLACE ORDER 
+       
         public async Task<string> PlaceOrderAsync(int itemId)
         {
             var item = await _itemRepo.GetAllIncluding(x => x.QuoteHeader)
@@ -265,16 +264,16 @@ namespace core.Solar
                 await InvalidateUserCache(item.QuoteHeader.UserId);
             }
 
-            // 4. TRIGGER EMAIL JOB (New Feature!)
+            // 4. TRIGGER EMAIL JOB 
             // Queue the email job in background
             await _backgroundJobManager.EnqueueAsync<OrderEmailJob, int>(orderId);
 
             return "Order Placed Successfully! Confirmation Email Sent.";
         }
 
-        // =========================================================
+     
         // 7. PRODUCT MANAGEMENT (CRUD)
-        // =========================================================
+   
 
         public async Task<List<SolarProduct>> GetAllProducts()
         {
@@ -336,9 +335,8 @@ namespace core.Solar
             await InvalidateProductsCache();
         }
 
-        // =========================================================
         // PRIVATE HELPERS
-        // =========================================================
+        
 
         private decimal CalculateFinalPrice(SolarProduct product)
         {
