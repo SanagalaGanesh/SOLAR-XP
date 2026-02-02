@@ -5,7 +5,7 @@ using System.Net.Mail;
 
 namespace core.Jobs
 {
-    // Arguments class (Email + Code pass cheyadaniki)
+    
     public class PasswordResetArgs
     {
         public string TargetEmail { get; set; }

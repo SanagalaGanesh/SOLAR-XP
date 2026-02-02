@@ -265,7 +265,7 @@ namespace core.Solar
             }
 
             // 4. TRIGGER EMAIL JOB 
-            // Queue the email job in background
+    
             await _backgroundJobManager.EnqueueAsync<OrderEmailJob, int>(orderId);
 
             return "Order Placed Successfully! Confirmation Email Sent.";
