@@ -1,0 +1,214 @@
+<div class="page">
+  <!-- Compact Form Header -->
+  <div class="compact-header">
+    <div class="header-content">
+      <div class="header-icon">📦</div>
+      <div>
+        <h2>{{ isEditing ? 'Edit Solar Product' : 'Add Solar Product' }}</h2>
+        <p class="header-subtitle">
+          {{ isEditing ? 'Update your solar product details' : 'Add new product to inventory' }}
+        </p>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button type="button" (click)="cancel()" class="btn btn-cancel">
+        ← Back
+      </button>
+    </div>
+  </div>
+
+  <!-- API Status -->
+  <div *ngIf="apiStatus" class="api-status" [ngClass]="apiStatus.type">
+    <span class="status-icon">{{ apiStatus.icon }}</span>
+    <span class="status-text">{{ apiStatus.message }}</span>
+  </div>
+
+  <!-- Compact Form -->
+  <div class="compact-form-card">
+    <!-- Loading State -->
+    <div *ngIf="loading" class="loading-state">
+      <div class="solar-spinner"></div>
+      <p>{{ isEditing ? 'Loading...' : 'Saving...' }}</p>
+    </div>
+
+    <!-- Form -->
+    <form *ngIf="!loading" (ngSubmit)="save()" class="compact-form" #productForm="ngForm">
+      
+      <div class="form-grid">
+        <!-- Product Type -->
+        <div class="form-group">
+          <label for="type" class="required">Product Type</label>
+          <select 
+            id="type"
+            [(ngModel)]="form.type"
+            name="type"
+            required
+            class="form-select"
+            (change)="onTypeChange()"
+            [disabled]="loading"
+          >
+            <option value="">Select type</option>
+            <option *ngFor="let type of productTypes" [value]="type">
+              {{ type }}
+            </option>
+          </select>
+        </div>
+
+        <!-- Wattage -->
+        <div class="form-group">
+          <label for="watt" class="required">Wattage (W)</label>
+          <select 
+            id="watt"
+            [(ngModel)]="form.watt"
+            name="watt"
+            required
+            class="form-select"
+            [disabled]="loading"
+          >
+            <option value="">Select wattage</option>
+            <option *ngFor="let watt of wattageOptions" [value]="watt">
+              {{ watt }}W
+            </option>
+          </select>
+        </div>
+
+        <!-- Base Price -->
+        <div class="form-group">
+          <label for="basePrice" class="required">Base Price (₹)</label>
+          <input
+            id="basePrice"
+            type="number"
+            [(ngModel)]="form.basePrice"
+            name="basePrice"
+            required
+            min="0"
+            step="0.01"
+            placeholder="0.00"
+            (input)="updateCalculations()"
+            class="form-input"
+            [disabled]="loading"
+          />
+        </div>
+
+        <!-- Subsidy -->
+        <div class="form-group">
+          <label for="subsidy" class="required">Subsidy (₹)</label>
+          <input
+            id="subsidy"
+            type="number"
+            [(ngModel)]="form.subsidy"
+            name="subsidy"
+            required
+            min="0"
+            step="0.01"
+            placeholder="0.00"
+            (input)="updateCalculations()"
+            class="form-input"
+            [disabled]="loading"
+          />
+        </div>
+
+        <!-- Efficiency -->
+        <div class="form-group">
+          <label for="efficiency">Efficiency (%)</label>
+          <input
+            id="efficiency"
+            type="number"
+            [(ngModel)]="form.efficiency"
+            name="efficiency"
+            min="0"
+            max="100"
+            step="0.1"
+            placeholder="21.5"
+            class="form-input"
+            [disabled]="loading"
+          />
+        </div>
+
+        <!-- Warranty -->
+        <div class="form-group">
+          <label for="warranty">Warranty (Years)</label>
+          <select
+            id="warranty"
+            [(ngModel)]="form.warranty"
+            name="warranty"
+            class="form-select"
+            [disabled]="loading"
+          >
+            <option value="">Select warranty</option>
+            <option *ngFor="let warranty of warrantyOptions" [value]="warranty.value">
+              {{ warranty.label }}
+            </option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Description -->
+      <div class="form-group">
+        <label for="description">Description</label>
+        <textarea
+          id="description"
+          [(ngModel)]="form.description"
+          name="description"
+          rows="2"
+          placeholder="Enter product description..."
+          class="form-textarea"
+          [disabled]="loading"
+        ></textarea>
+      </div>
+
+      <!-- Price Summary -->
+      <div class="price-summary">
+        <div class="price-row">
+          <span>Base Price:</span>
+          <span class="price-value">₹{{ form.basePrice || 0 | number:'1.2-2' }}</span>
+        </div>
+        <div class="price-row">
+          <span>Subsidy:</span>
+          <span class="subsidy-value">- ₹{{ form.subsidy || 0 | number:'1.2-2' }}</span>
+        </div>
+        <div class="price-divider"></div>
+        <div class="price-row total">
+          <span>Net Price:</span>
+          <span class="net-price">₹{{ calculateNetPrice() | number:'1.2-2' }}</span>
+        </div>
+        <div *ngIf="form.basePrice > 0" class="price-row">
+          <span>Subsidy %:</span>
+          <span class="percentage">{{ calculateSubsidyPercentage() | number:'1.1-1' }}%</span>
+        </div>
+        <div *ngIf="form.watt > 0" class="price-row">
+          <span>Price/Watt:</span>
+          <span class="per-watt">₹{{ calculatePricePerWatt() | number:'1.2-2' }}/W</span>
+        </div>
+      </div>
+
+      <!-- Form Actions -->
+      <div class="form-actions">
+        <button 
+          type="submit" 
+          class="btn btn-save" 
+          [disabled]="loading || productForm.invalid"
+        >
+          {{ isEditing ? 'Update' : 'Create' }}
+        </button>
+        <button 
+          type="button" 
+          (click)="cancel()" 
+          class="btn btn-cancel" 
+          [disabled]="loading"
+        >
+          Cancel
+        </button>
+        <button 
+          type="button" 
+          (click)="resetForm()" 
+          class="btn btn-reset" 
+          [disabled]="loading"
+          *ngIf="!isEditing"
+        >
+          Reset
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

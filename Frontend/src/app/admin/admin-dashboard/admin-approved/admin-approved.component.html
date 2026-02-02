@@ -1,0 +1,52 @@
+
+    <div class="page">
+      <h2>Approved Quotes</h2>
+
+      <div class="table-card">
+        <table>
+          <thead>
+            <tr>
+              <th>S.No</th>
+              <th>Customer</th>
+              <th>Solar Model</th>
+              <th>Price</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr *ngFor="let q of approvedQuotes; let i = index">
+  <td>{{ i + 1 }}</td>
+
+              <td>
+                <b>{{ q.customerName }}</b><br />
+                <small>{{ q.mobile }}</small>
+              </td>
+
+              <td>
+                <div *ngFor="let i of q.items">
+                  {{ i.productName }}
+                </div>
+              </td>
+
+              <td>
+                <div *ngFor="let i of q.items" class="amount">
+                  ₹ {{ i.price }}
+                </div>
+              </td>
+
+              <td>
+                <span class="status approved">Approved</span>
+              </td>
+            </tr>
+
+            <tr *ngIf="approvedQuotes.length === 0">
+              <td colspan="5" class="empty">
+                No approved quotes found
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  

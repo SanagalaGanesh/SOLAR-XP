@@ -1,0 +1,71 @@
+
+    <div class="page">
+
+      <h2>Pending Quote Requests</h2>
+
+      <div class="table-card">
+        <table>
+          <thead>
+            <tr>
+              <th>S.No</th>
+              <th>Customer</th>
+              <th>Address</th>
+              <th>Items</th>
+              <th>Prices</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr *ngFor="let q of pendingQuotes; let i = index">
+
+              <!-- S.NO -->
+              <td>
+                {{ i + 1 }} <br />
+                <small>{{ q.date }}</small>
+              </td>
+
+              <!-- CUSTOMER -->
+              <td>
+                <b>{{ q.customerName }}</b><br />
+                <small>{{ q.mobile }}</small>
+              </td>
+
+              <!-- ADDRESS -->
+              <td>{{ q.address }}</td>
+
+              <!-- ITEMS -->
+              <td>
+                <div *ngFor="let item of q.items">
+                  {{ item.productName }}
+                </div>
+              </td>
+
+              <!-- PRICES -->
+              <td>
+                <div *ngFor="let item of q.items" class="amount">
+                  ₹ {{ item.price }}
+                </div>
+              </td>
+
+              <!-- ACTION -->
+              <td>
+                <button
+                  class="approve-btn"
+                  (click)="approve(q.headerId)">
+                  Approve
+                </button>
+              </td>
+            </tr>
+
+            <tr *ngIf="pendingQuotes.length === 0">
+              <td colspan="6" class="empty">
+                No pending requests
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+  

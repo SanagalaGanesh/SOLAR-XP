@@ -1,0 +1,727 @@
+/* PAGE - Solar Theme */
+.page {
+  width: 99%;
+  padding: 16px;
+  background: linear-gradient(135deg, #0c4a6e 0%, #0369a1 100%);
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+}
+
+.page::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    radial-gradient(circle at 20% 80%, rgba(251, 191, 36, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(245, 158, 11, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 40% 40%, rgba(234, 179, 8, 0.05) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+.page-header {
+  margin-bottom: 24px;
+  position: relative;
+  z-index: 1;
+}
+
+h2 {
+  margin-bottom: 4px;
+  font-size: 24px;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: -0.5px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.subtitle {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.9);
+  margin-bottom: 20px;
+  font-weight: 400;
+}
+
+/* HEADER ACTIONS - Solar Panel Inspired */
+.header-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  background: rgba(255, 255, 255, 0.95);
+  padding: 16px 20px;
+  border-radius: 12px;
+  box-shadow: 
+    0 4px 20px rgba(0, 0, 0, 0.1),
+    0 0 0 1px rgba(251, 191, 36, 0.2),
+    inset 0 1px 2px rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+.header-actions::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, 
+    #fbbf24 0%, 
+    #f59e0b 25%, 
+    #eab308 50%, 
+    #f59e0b 75%, 
+    #fbbf24 100%);
+  border-radius: 12px 12px 0 0;
+}
+
+.customer-count {
+  font-size: 14px;
+  font-weight: 600;
+  color: #0f172a;
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: 1px solid rgba(251, 191, 36, 0.3);
+  box-shadow: 
+    0 2px 8px rgba(245, 158, 11, 0.15),
+    inset 0 1px 2px rgba(255, 255, 255, 0.5);
+}
+
+.customer-count span {
+  color: #d97706;
+  font-weight: 700;
+  background: linear-gradient(135deg, #92400e 0%, #b45309 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* SEARCH - Solar Style */
+.search-wrapper {
+  position: relative;
+  width: 280px;
+}
+
+.search-wrapper input {
+  width: 100%;
+  padding: 10px 40px 10px 40px;
+  font-size: 14px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  outline: none;
+  background: #ffffff;
+  transition: all 0.3s ease;
+  color: #1f2937;
+  box-shadow: 
+    0 2px 8px rgba(0, 0, 0, 0.08),
+    inset 0 1px 2px rgba(255, 255, 255, 0.5);
+    margin-left: -23%;
+}
+
+.search-wrapper input:focus {
+  border-color: #f59e0b;
+  box-shadow: 
+    0 0 0 3px rgba(245, 158, 11, 0.15),
+    0 2px 12px rgba(245, 158, 11, 0.2);
+}
+
+.search-wrapper::before {
+  content: "☀️";
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 16px;
+  opacity: 0.7;
+  margin-left: -25%;
+}
+
+.clear-btn {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  border: none;
+  background: none;
+  font-size: 18px;
+  color: #94a3b8;
+  cursor: pointer;
+  padding: 0;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.2s;
+  background: #f1f5f9;
+}
+
+.clear-btn:hover {
+  background: #f59e0b;
+  color: white;
+  transform: translateY(-50%) scale(1.1);
+}
+
+/* TABLE CARD - Solar Panel Grid */
+.table-card {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.95) 100%);
+  padding: 20px;
+  border-radius: 16px;
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.1),
+    0 0 0 1px rgba(251, 191, 36, 0.1),
+    inset 0 1px 2px rgba(255, 255, 255, 0.8);
+  overflow-x: auto;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  position: relative;
+  overflow: hidden;
+}
+
+.table-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: 
+    linear-gradient(90deg, transparent 49px, rgba(251, 191, 36, 0.03) 49px, rgba(251, 191, 36, 0.03) 50px, transparent 50px),
+    linear-gradient(0deg, transparent 49px, rgba(251, 191, 36, 0.03) 49px, rgba(251, 191, 36, 0.03) 50px, transparent 50px);
+  background-size: 50px 50px;
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+/* TABLE */
+table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  min-width: 800px;
+  font-size: 13px;
+  position: relative;
+  z-index: 1;
+}
+
+th {
+  padding: 12px 16px;
+  background: linear-gradient(135deg, #0f766e 0%, #0d9488 100%);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: white;
+  text-align: left;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  border: none;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+th:first-child {
+  border-top-left-radius: 8px;
+  border-bottom-left-radius: 8px;
+}
+
+th:last-child {
+  border-top-right-radius: 8px;
+  border-bottom-right-radius: 8px;
+}
+
+td {
+  padding: 14px 16px;
+  border-bottom: 1px solid #f1f5f9;
+  color: #334155;
+  vertical-align: middle;
+  transition: all 0.2s;
+  background: rgba(255, 255, 255, 0.9);
+}
+
+tbody tr {
+  transition: all 0.2s;
+  position: relative;
+}
+
+tbody tr:hover {
+  background: linear-gradient(90deg, rgba(245, 158, 11, 0.08) 0%, rgba(234, 179, 8, 0.04) 100%);
+  transform: translateY(-1px);
+  box-shadow: 
+    0 4px 12px rgba(245, 158, 11, 0.1),
+    0 0 0 1px rgba(251, 191, 36, 0.2);
+  border-radius: 8px;
+}
+
+tbody tr:hover td {
+  background: transparent;
+}
+
+/* ALIGNMENT */
+.center {
+  text-align: center;
+}
+
+.name {
+  font-weight: 600;
+  font-size: 14px;
+  color: #0f172a;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.name::before {
+  content: "🔆";
+  font-size: 14px;
+  opacity: 0.8;
+}
+
+/* STATUS - Solar Energy Inspired */
+.status {
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.3s;
+  border: 1px solid transparent;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.status.active {
+  background: linear-gradient(135deg, #10b981 0%, #34d399 100%);
+  color: white;
+  box-shadow: 
+    0 2px 8px rgba(16, 185, 129, 0.3),
+    inset 0 1px 2px rgba(255, 255, 255, 0.3);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.status.active::before {
+  content: "⚡";
+}
+
+.status.inactive {
+  background: linear-gradient(135deg, #64748b 0%, #94a3b8 100%);
+  color: white;
+  box-shadow: 
+    0 2px 8px rgba(100, 116, 139, 0.3),
+    inset 0 1px 2px rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.status.inactive::before {
+  content: "🌙";
+}
+
+/* VIEW BUTTON - Solar Style */
+.view-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 6px 16px;
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+  box-shadow: 
+    0 3px 10px rgba(245, 158, 11, 0.3),
+    inset 0 1px 2px rgba(255, 255, 255, 0.3);
+  min-width: 80px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.view-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 
+    0 5px 20px rgba(245, 158, 11, 0.4),
+    inset 0 1px 2px rgba(255, 255, 255, 0.4);
+  background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+}
+
+.view-icon {
+  width: 14px;
+  height: 14px;
+  filter: brightness(0) invert(1);
+}
+
+/* EMPTY STATE - Solar Theme */
+.empty {
+  text-align: center;
+  padding: 40px 20px;
+  color: #64748b;
+  font-style: italic;
+  font-size: 14px;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 12px;
+  border: 2px dashed #cbd5e1;
+}
+
+.empty::before {
+  content: "☀️";
+  font-size: 32px;
+  display: block;
+  margin-bottom: 12px;
+  opacity: 0.6;
+  animation: pulse 2s infinite;
+}
+
+/* MODAL - COMPACT SIZE */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(6, 95, 70, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+  animation: fadeIn 0.2s ease-out;
+  backdrop-filter: blur(4px);
+}
+
+.modal-content {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(248, 250, 252, 0.98) 100%);
+  border-radius: 16px;
+  width: 100%;
+  max-width: 500px; /* Reduced from 600px */
+  max-height: 85vh;
+  overflow-y: auto;
+  animation: slideUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  box-shadow: 
+    0 20px 40px rgba(6, 95, 70, 0.3),
+    0 0 0 1px rgba(251, 191, 36, 0.2),
+    inset 0 1px 2px rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  position: relative;
+}
+
+.modal-content::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, 
+    #10b981 0%, 
+    #0d9488 25%, 
+    #0f766e 50%, 
+    #0d9488 75%, 
+    #10b981 100%);
+  border-radius: 16px 16px 0 0;
+}
+
+.modal-header {
+  padding: 20px 24px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: transparent;
+}
+
+.modal-header h3 {
+  margin: 0;
+  font-size: 18px; /* Reduced from 20px */
+  font-weight: 700;
+  color: #0f172a;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.modal-header h3::before {
+  content: "🔋";
+  font-size: 16px;
+  color: #f59e0b;
+}
+
+.close-btn {
+  background: rgba(203, 213, 225, 0.2);
+  border: 1px solid #cbd5e1;
+  padding: 6px;
+  cursor: pointer;
+  color: #64748b;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  width: 32px;
+  height: 32px;
+}
+
+.close-btn:hover {
+  background: #f59e0b;
+  border-color: #f59e0b;
+  color: white;
+  transform: rotate(90deg);
+}
+
+.close-btn svg {
+  width: 18px;
+  height: 18px;
+}
+
+.modal-body {
+  padding: 16px 24px; /* Reduced padding */
+  background: transparent;
+}
+
+.detail-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px; /* Reduced gap */
+}
+
+.detail-item {
+  background: white;
+  padding: 16px; /* Reduced padding */
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
+  transition: all 0.2s;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.detail-item:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  border-color: #f59e0b;
+}
+
+.detail-item.full-width {
+  grid-column: 1 / -1;
+}
+
+.detail-item label {
+  display: block;
+  font-size: 10px; /* Reduced from 11px */
+  font-weight: 600;
+  color: #64748b;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.detail-item p {
+  margin: 0;
+  font-size: 14px; /* Reduced from 16px */
+  color: #1e293b;
+  line-height: 1.4;
+  font-weight: 500;
+}
+
+.detail-item .notes {
+  background: #f8fafc;
+  padding: 12px; /* Reduced padding */
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  margin-top: 8px;
+  font-size: 13px; /* Reduced from 14px */
+  color: #475569;
+  line-height: 1.5;
+}
+
+.detail-item .status {
+  margin-top: 4px;
+  font-size: 10px; /* Reduced for modal */
+  padding: 4px 10px;
+}
+
+.modal-footer {
+  padding: 16px 24px; /* Reduced padding */
+  border-top: 1px solid #e2e8f0;
+  display: flex;
+  justify-content: flex-end;
+  background: transparent;
+}
+
+.btn-secondary {
+  padding: 8px 24px; /* Reduced padding */
+  background: linear-gradient(135deg, #64748b 0%, #475569 100%);
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-size: 13px; /* Reduced from 14px */
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+  box-shadow: 0 2px 8px rgba(100, 116, 139, 0.2);
+  min-width: 100px;
+}
+
+.btn-secondary:hover {
+  background: linear-gradient(135deg, #475569 0%, #334155 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(100, 116, 139, 0.3);
+}
+
+/* ANIMATIONS */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% { 
+    opacity: 0.6;
+    transform: scale(1);
+  }
+  50% { 
+    opacity: 1;
+    transform: scale(1.1);
+  }
+}
+
+@keyframes solarGlow {
+  0%, 100% {
+    box-shadow: 
+      0 2px 8px rgba(16, 185, 129, 0.3),
+      inset 0 1px 2px rgba(255, 255, 255, 0.3);
+  }
+  50% {
+    box-shadow: 
+      0 2px 12px rgba(16, 185, 129, 0.5),
+      inset 0 1px 2px rgba(255, 255, 255, 0.5);
+  }
+}
+
+.status.active {
+  animation: solarGlow 2s infinite;
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  .page {
+    padding: 12px;
+  }
+  
+  .header-actions {
+    flex-direction: column;
+    gap: 12px;
+    align-items: stretch;
+    padding: 12px;
+  }
+  
+  .search-wrapper {
+    width: 100%;
+  }
+  
+  .table-card {
+    padding: 12px;
+    margin: 0 -8px;
+    border-radius: 12px;
+  }
+  
+  table {
+    min-width: 700px;
+  }
+  
+  th, td {
+    padding: 10px 12px;
+  }
+  
+  .modal-content {
+    margin: 10px;
+    max-width: 95%;
+  }
+  
+  .detail-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+  
+  .modal-body {
+    padding: 12px 16px;
+  }
+  
+  .modal-header {
+    padding: 16px 20px 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  h2 {
+    font-size: 20px;
+  }
+  
+  .customer-count {
+    font-size: 12px;
+    padding: 6px 12px;
+  }
+  
+  .view-btn span {
+    display: none;
+  }
+  
+  .view-btn {
+    padding: 6px;
+    width: 32px;
+    height: 32px;
+    min-width: auto;
+  }
+  
+  .view-icon {
+    margin-right: 0;
+  }
+  
+  table {
+    min-width: 600px;
+    font-size: 12px;
+  }
+  
+  .modal-header h3 {
+    font-size: 16px;
+  }
+  
+  .detail-item p {
+    font-size: 13px;
+  }
+}
+
+/* Add subtle grid pattern for solar panel effect */
+.page::after {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: 
+    linear-gradient(90deg, transparent 99px, rgba(251, 191, 36, 0.02) 99px, rgba(251, 191, 36, 0.02) 100px, transparent 100px),
+    linear-gradient(0deg, transparent 99px, rgba(251, 191, 36, 0.02) 99px, rgba(251, 191, 36, 0.02) 100px, transparent 100px);
+  background-size: 100px 100px;
+  pointer-events: none;
+  opacity: 0.3;
+}

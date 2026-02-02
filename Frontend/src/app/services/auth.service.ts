@@ -5,7 +5,8 @@ import { Observable } from 'rxjs';
 @Injectable({ providedIn: 'root' })
 export class AuthService {
 
-  private API_URL = 'http://192.168.168.76:5000';
+  // private API_URL = 'http://192.168.168.76:5000';
+  private readonly API_URL = 'http://localhost:5000';
 
   constructor(private http: HttpClient) {}
 
